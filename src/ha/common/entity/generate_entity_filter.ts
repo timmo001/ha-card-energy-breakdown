@@ -24,7 +24,7 @@ export const generateEntityFilter = (
   filter: EntityFilter
 ): EntityFilterFunc => {
   console.log("[Entity Filter] Creating filter with:", filter);
-
+  
   const domains = filter.domain
     ? new Set(ensureArray(filter.domain))
     : undefined;
@@ -63,7 +63,7 @@ export const generateEntityFilter = (
       console.log(`[Entity Filter] Entity ${entityId} not found in states`);
       return false;
     }
-
+    
     if (domains) {
       const domain = computeDomain(entityId);
       if (!domains.has(domain)) {
@@ -74,7 +74,7 @@ export const generateEntityFilter = (
         return false;
       }
     }
-
+    
     if (deviceClasses) {
       const dc = stateObj.attributes.device_class || "none";
       if (!deviceClasses.has(dc)) {
@@ -121,7 +121,7 @@ export const generateEntityFilter = (
         return false;
       }
     }
-
+    
     if (areas) {
       if (!area) {
         console.log(
@@ -188,7 +188,7 @@ export const generateEntityFilter = (
         return false;
       }
     }
-
+    
     if (hiddenPlatforms) {
       if (!entity) {
         console.log(
