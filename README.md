@@ -4,7 +4,8 @@ A custom Home Assistant card for visualizing current energy usage with a breakdo
 
 ## Screenshots
 
-![Energy Breakdown Card](https://raw.githubusercontent.com/timmo001/ha-card-energy-breakdown/main/docs/screenshot.png)
+![Energy Breakdown Card - Light](https://raw.githubusercontent.com/timmo001/ha-card-energy-breakdown/main/docs/screenshot-light.png)
+![Energy Breakdown Card - Dark](https://raw.githubusercontent.com/timmo001/ha-card-energy-breakdown/main/docs/screenshot-dark.png)
 
 ## Features
 
@@ -22,7 +23,7 @@ Since this card is not yet in the default HACS store, you need to add it as a cu
 2. Click the **3 dots** in the top right corner
 3. Select **"Custom repositories"**
 4. Add repository URL: `https://github.com/timmo001/ha-card-energy-breakdown`
-5. Select category: **Plugin**
+5. Select category: **Dashboard**
 6. Click **"ADD"**
 7. Find "Energy Breakdown Card" in the list and click **Download**
 
