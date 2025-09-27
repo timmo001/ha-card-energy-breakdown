@@ -123,9 +123,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       : true;
     if (!powerEntityCompatible) {
       return html`<ha-alert alert-type="error">
-        ${this.hass.localize(
-          "ui.panel.lovelace.editor.card.energy-breakdown-usage.power_entity_invalid"
-        )}
+        Invalid power entity
       </ha-alert>`;
     }
 
@@ -187,7 +185,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         if (powerEntityState) {
           breakdowns.push({
             id: "untracked",
-            name: hass.localize("ui.common.untracked"),
+            name: "Untracked",
             value:
               Number(powerEntityState) -
               breakdowns.reduce((acc, bd) => acc + bd.value, 0),
