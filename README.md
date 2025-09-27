@@ -1,5 +1,8 @@
 # ⚡ Energy Breakdown Card
 
+> [!NOTE]
+> This card is very experimental. It is not intended for general use.
+
 A custom Home Assistant card for visualizing current energy usage with a breakdown by area and entity.
 
 ## Screenshots
