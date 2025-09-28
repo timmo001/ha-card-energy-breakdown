@@ -198,11 +198,16 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
   }
 
   public getGridOptions(): any {
+    const onlyOneHeaderShown =
+      (this._config?.header_current_show ? 1 : 0) +
+        (this._config?.header_day_show ? 1 : 0) ===
+      1;
+
     return {
       columns: 9,
       rows: 3,
-      min_columns: 8,
-      min_rows: 2,
+      min_columns: onlyOneHeaderShown ? 5 : 8,
+      min_rows: 1,
     };
   }
 
@@ -324,7 +329,9 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       currentStateObj?.state,
       this._config
     );
-    const gridRows = Number(this._config.grid_options?.rows ?? 3);
+    const gridRows = Number(
+      this._config.grid_options?.rows ?? this.getGridOptions().rows
+    );
 
     const _computeEntityBreakdown = memoizeOne(
       (
@@ -379,7 +386,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                 heading: true,
                 "reduced-padding": gridRows < 3,
                 "with-day-total": this._config?.header_day_show,
-                "breakdown-hidden": !this._config?.breakdown_show,
+                "breakdown-hidden": this._config?.breakdown_show === false,
               })}
               @click=${this._handleHeadingClick}
             >
@@ -406,7 +413,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                           >${currentStateObj ? uom : "W"}</span
                         >
                       </div>
-                      ${!this._config?.header_current_title_hide
+                      ${!this._config?.header_current_title_hide && gridRows > 1
                         ? html`<div class="section-label">Current</div>`
                         : nothing}
                     </div>
@@ -426,7 +433,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                         >
                         <span class="measurement">kWh</span>
                       </div>
-                      ${!this._config?.header_day_title_hide
+                      ${!this._config?.header_day_title_hide && gridRows > 1
                         ? html`<div class="section-label">Today</div>`
                         : nothing}
                     </div>
@@ -435,7 +442,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
             </div>
           `
         : nothing}
-      ${this._config?.breakdown_show
+      ${this._config?.breakdown_show && gridRows > 1
         ? html`
             <div class="breakdown ha-scrollbar">
               ${showBackButton
@@ -583,7 +590,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         }
 
         .heading.breakdown-hidden {
-          width: 100%;
+          flex: 1;
         }
 
         .power-section,
