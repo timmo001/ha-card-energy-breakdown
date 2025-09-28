@@ -17,7 +17,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
   @state() private _config?: EnergyBreakdownCardConfig;
 
   private _schema = memoizeOne(
-    () =>
+    (config: EnergyBreakdownCardConfig) =>
       [
         {
           name: "power_entity",
@@ -58,12 +58,14 @@ export class EnergyBreakdownCardEditor extends LitElement {
               schema: [
                 {
                   name: "header_current_icon",
+                  disabled: !config.header_current_show,
                   selector: {
                     icon: {},
                   },
                 },
                 {
                   name: "header_day_icon",
+                  disabled: !config.header_day_show,
                   selector: {
                     icon: {},
                   },
@@ -76,12 +78,14 @@ export class EnergyBreakdownCardEditor extends LitElement {
               schema: [
                 {
                   name: "header_current_title_hide",
+                  disabled: !config.header_current_show,
                   selector: {
                     boolean: {},
                   },
                 },
                 {
                   name: "header_day_title_hide",
+                  disabled: !config.header_day_show,
                   selector: {
                     boolean: {},
                   },
@@ -118,7 +122,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
       return nothing;
     }
 
-    const schema = this._schema();
+    const schema = this._schema(this._config);
 
     return html`
       <ha-form
