@@ -63,10 +63,6 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       breakdown_sort: "name-asc",
       ...config,
     };
-    if (this.hass && this._config?.header_day_show) {
-      this._fetchDayTotal();
-    }
-    setTimeout(() => this.requestUpdate(), 0);
   }
 
   @property({ attribute: false }) public hass!: HomeAssistant;
@@ -75,11 +71,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   protected willUpdate(changedProps: PropertyValues): void {
     super.willUpdate(changedProps);
-    if (
-      (changedProps.has("hass") || changedProps.has("_config")) &&
-      this._config?.header_day_show &&
-      this.hass
-    ) {
+    if (changedProps.has("_config") && this._config?.header_day_show) {
       this._fetchDayTotal();
     }
   }
