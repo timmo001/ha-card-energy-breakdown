@@ -200,10 +200,10 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     }
 
     const entityId = this._config.power_entity;
-    const stateObj = entityId ? this.hass.states[entityId] : undefined;
+    const currentStateObj = entityId ? this.hass.states[entityId] : undefined;
 
-    const powerEntityCompatible = stateObj
-      ? stateObj.attributes.device_class === "power"
+    const powerEntityCompatible = currentStateObj
+      ? currentStateObj.attributes.device_class === "power"
       : true;
     if (!powerEntityCompatible) {
       return html`<ha-alert alert-type="error">
@@ -211,7 +211,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       </ha-alert>`;
     }
 
-    const uom = stateObj?.attributes.unit_of_measurement;
+    const uom = currentStateObj?.attributes.unit_of_measurement;
     const powerEntityIcon = this._config.header_current_icon?.length
       ? this._config.header_current_icon
       : "mdi:lightning-bolt";
@@ -284,7 +284,11 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       }
     );
 
-    const breakdown = _computeBreakdown(this.hass, entityId, stateObj?.state);
+    const breakdown = _computeBreakdown(
+      this.hass,
+      entityId,
+      currentStateObj?.state
+    );
     const gridRows = Number(this._config.grid_options?.rows ?? 3);
 
     const _computeEntityBreakdown = memoizeOne(
@@ -323,8 +327,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       this._currentView === "entities" && currentNavigation;
 
     return html`<ha-card>
-      ${(stateObj && this._config?.header_current_show) ||
-      this._config?.header_day_show
+      ${this._config?.header_current_show || this._config?.header_day_show
         ? html`
             <div
               class=${classMap({
@@ -335,7 +338,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
               })}
               @click=${this._handleHeadingClick}
             >
-              ${stateObj && this._config?.header_current_show
+              ${this._config?.header_current_show
                 ? html`
                     <div class="power-section">
                       <div class="section-value">
@@ -344,11 +347,19 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                           .icon=${powerEntityIcon}
                         ></ha-icon>
                         <span class="value"
-                          >${formatNumber(stateObj?.state, this.hass.locale, {
-                            maximumFractionDigits: 1,
-                          })}</span
+                          >${currentStateObj
+                            ? formatNumber(
+                                currentStateObj.state,
+                                this.hass.locale,
+                                {
+                                  maximumFractionDigits: 1,
+                                }
+                              )
+                            : "--.-"}</span
                         >
-                        <span class="measurement">${uom}</span>
+                        <span class="measurement"
+                          >${currentStateObj ? uom : "W"}</span
+                        >
                       </div>
                       ${!this._config?.header_current_title_hide
                         ? html`<div class="section-label">Current</div>`
@@ -366,7 +377,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                             ? formatNumber(this._dayTotal, this.hass.locale, {
                                 maximumFractionDigits: 1,
                               })
-                            : "--"}</span
+                            : "--.-"}</span
                         >
                         <span class="measurement">kWh</span>
                       </div>
@@ -379,7 +390,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
             </div>
           `
         : nothing}
-      ${gridRows > 1 || !stateObj
+      ${gridRows > 1 || !currentStateObj
         ? html`
             <div class="breakdown ha-scrollbar">
               ${showBackButton
