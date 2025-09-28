@@ -55,7 +55,14 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   public setConfig(config: EnergyBreakdownCardConfig): void {
     assert(config, energyBreakdownCardConfigStruct);
-    this._config = { ...config };
+    this._config = {
+      header_current_show: true,
+      header_day_show: true,
+      ...config,
+    };
+    if (this.hass && this._config?.header_day_show) {
+      this._fetchDayTotal();
+    }
     setTimeout(() => this.requestUpdate(), 0);
   }
 
@@ -65,7 +72,11 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   protected willUpdate(changedProps: PropertyValues): void {
     super.willUpdate(changedProps);
-    if (changedProps.has("hass") && this._config?.header_day) {
+    if (
+      (changedProps.has("hass") || changedProps.has("_config")) &&
+      this._config?.header_day_show &&
+      this.hass
+    ) {
       this._fetchDayTotal();
     }
   }
@@ -115,7 +126,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
   }
 
   private async _fetchDayTotal(): Promise<void> {
-    if (!this._config?.header_day || !this.hass) {
+    if (!this._config?.header_day_show || !this.hass) {
       this._dayTotal = null;
       return;
     }
@@ -201,12 +212,12 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     }
 
     const uom = stateObj?.attributes.unit_of_measurement;
-    const powerEntityIcon = this._config.power_icon?.length
-      ? this._config.power_icon
+    const powerEntityIcon = this._config.header_current_icon?.length
+      ? this._config.header_current_icon
       : "mdi:lightning-bolt";
 
-    const todayIcon = this._config.today_icon?.length
-      ? this._config.today_icon
+    const todayIcon = this._config.header_day_icon?.length
+      ? this._config.header_day_icon
       : "mdi:calendar-today";
 
     const _computeBreakdown = memoizeOne(
@@ -312,18 +323,19 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       this._currentView === "entities" && currentNavigation;
 
     return html`<ha-card>
-      ${(stateObj && this._config?.header_current) || this._config?.header_day
+      ${(stateObj && this._config?.header_current_show) ||
+      this._config?.header_day_show
         ? html`
             <div
               class=${classMap({
                 heading: true,
                 "reduced-padding": gridRows < 3,
                 "single-row": gridRows === 1,
-                "with-day-total": !this._config?.hide_day_total,
+                "with-day-total": this._config?.header_day_show,
               })}
               @click=${this._handleHeadingClick}
             >
-              ${stateObj && this._config?.header_current
+              ${stateObj && this._config?.header_current_show
                 ? html`
                     <div class="power-section">
                       <div class="section-value">
@@ -338,13 +350,13 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                         >
                         <span class="measurement">${uom}</span>
                       </div>
-                      ${!this._config?.hide_current_title
+                      ${!this._config?.header_current_title_hide
                         ? html`<div class="section-label">Current</div>`
                         : nothing}
                     </div>
                   `
                 : nothing}
-              ${this._config?.header_day
+              ${this._config?.header_day_show
                 ? html`
                     <div class="day-total-section">
                       <div class="section-value">
@@ -358,7 +370,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                         >
                         <span class="measurement">kWh</span>
                       </div>
-                      ${!this._config?.hide_daily_title
+                      ${!this._config?.header_day_title_hide
                         ? html`<div class="section-label">Today</div>`
                         : nothing}
                     </div>

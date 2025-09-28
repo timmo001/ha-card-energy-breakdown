@@ -11,23 +11,23 @@ import { lovelaceCardConfigStruct } from "../shared/config/lovelace-card-config"
 
 export interface EnergyBreakdownCardConfig extends LovelaceCardConfig {
   power_entity?: string;
-  power_icon?: string;
-  header_current?: boolean;
-  header_day?: boolean;
-  today_icon?: string;
-  hide_current_title?: boolean;
-  hide_daily_title?: boolean;
+  header_current_show?: boolean;
+  header_day_show?: boolean;
+  header_current_icon?: string;
+  header_day_icon?: string;
+  header_current_title_hide?: boolean;
+  header_day_title_hide?: boolean;
 }
 
 export const energyBreakdownCardConfigStruct = assign(
   lovelaceCardConfigStruct,
   object({
     power_entity: optional(string()),
-    power_icon: optional(string()),
-    today_icon: optional(string()),
-    header_day: optional(defaulted(boolean(), true)),
-    header_current: optional(defaulted(boolean(), true)),
-    hide_current_title: optional(boolean()),
-    hide_daily_title: optional(boolean()),
+    header_current_show: optional(defaulted(boolean(), true)),
+    header_day_show: optional(defaulted(boolean(), true)),
+    header_current_icon: optional(string()),
+    header_day_icon: optional(string()),
+    header_current_title_hide: optional(boolean()),
+    header_day_title_hide: optional(boolean()),
   })
 );

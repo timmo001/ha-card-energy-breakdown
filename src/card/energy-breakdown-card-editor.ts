@@ -39,13 +39,13 @@ export class EnergyBreakdownCardEditor extends LitElement {
               type: "grid",
               schema: [
                 {
-                  name: "header_current",
+                  name: "header_current_show",
                   selector: {
                     boolean: {},
                   },
                 },
                 {
-                  name: "header_day",
+                  name: "header_day_show",
                   selector: {
                     boolean: {},
                   },
@@ -57,13 +57,13 @@ export class EnergyBreakdownCardEditor extends LitElement {
               type: "grid",
               schema: [
                 {
-                  name: "power_icon",
+                  name: "header_current_icon",
                   selector: {
                     icon: {},
                   },
                 },
                 {
-                  name: "today_icon",
+                  name: "header_day_icon",
                   selector: {
                     icon: {},
                   },
@@ -75,13 +75,13 @@ export class EnergyBreakdownCardEditor extends LitElement {
               type: "grid",
               schema: [
                 {
-                  name: "hide_current_title",
+                  name: "header_current_title_hide",
                   selector: {
                     boolean: {},
                   },
                 },
                 {
-                  name: "hide_daily_title",
+                  name: "header_day_title_hide",
                   selector: {
                     boolean: {},
                   },
@@ -97,8 +97,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
     assert(config, energyBreakdownCardConfigStruct);
 
     this._config = {
-      header_current: true,
-      header_day: true,
+      header_current_show: true,
+      header_day_show: true,
       ...config,
     };
   }
@@ -141,17 +141,17 @@ export class EnergyBreakdownCardEditor extends LitElement {
     switch (schema.name) {
       case "power_entity":
         return "The entity to use for current power usage";
-      case "power_icon":
+      case "header_current_icon":
         return "The icon to display for the power entity";
-      case "today_icon":
+      case "header_day_icon":
         return "The icon to display for the daily energy consumption";
-      case "header_current":
+      case "header_current_show":
         return "Show current power usage in the header";
-      case "header_day":
+      case "header_day_show":
         return "Show total energy consumption for the day so far";
-      case "hide_current_title":
+      case "header_current_title_hide":
         return "Hide the 'Current' label below the power usage display";
-      case "hide_daily_title":
+      case "header_day_title_hide":
         return "Hide the 'Today' label below the daily energy display";
       default:
         return undefined;
@@ -166,17 +166,17 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Appearance";
       case "visibility":
         return "Header";
-      case "power_icon":
+      case "header_current_icon":
         return "Power Icon";
-      case "today_icon":
+      case "header_day_icon":
         return "Today Icon";
-      case "header_current":
+      case "header_current_show":
         return "Current";
-      case "header_day":
+      case "header_day_show":
         return "Day";
-      case "hide_current_title":
+      case "header_current_title_hide":
         return "Hide 'Current'";
-      case "hide_daily_title":
+      case "header_day_title_hide":
         return "Hide 'Today'";
       default:
         return undefined;
