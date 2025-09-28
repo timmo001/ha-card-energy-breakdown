@@ -1,16 +1,12 @@
 import { HassEntity } from "home-assistant-js-websocket";
-import { html, nothing, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import { classMap } from "lit/directives/class-map.js";
 import {
-  computeRTL,
   HomeAssistant,
   isActive,
-  isAvailable,
   LovelaceGridOptions,
   LovelaceLayoutOptions,
 } from "../ha";
-import { computeAppearance, Appearance, AppearanceSharedConfig } from "./appearance";
+import { computeAppearance, AppearanceSharedConfig } from "./appearance";
 import { BaseElement } from "./base-element";
 import { computeInfoDisplay } from "./info";
 
