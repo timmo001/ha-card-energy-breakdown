@@ -32,7 +32,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
           name: "visibility",
           flatten: true,
           type: "expandable",
-          icon: "mdi:eye-off",
+          icon: "mdi:view-headline",
           expanded: true,
           schema: [
             {
