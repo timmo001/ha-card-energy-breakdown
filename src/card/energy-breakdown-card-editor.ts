@@ -99,9 +99,9 @@ export class EnergyBreakdownCardEditor extends LitElement {
   ): string | undefined => {
     switch (schema.name) {
       case "power_entity":
-        return "An entity to current power usage";
+        return "The entity to use for current power usage";
       case "power_icon":
-        return "An icon to display for the power entity";
+        return "The icon to display for the power entity";
       case "hide_day_total":
         return "Hide total energy consumption for the day so far";
       case "hide_current_title":
