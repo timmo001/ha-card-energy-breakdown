@@ -59,6 +59,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       header_current_show: true,
       header_day_show: true,
       breakdown_show_untracked: true,
+      breakdown_show_zero_values: false,
       breakdown_sort: "name-asc",
       ...config,
     };
@@ -229,7 +230,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         powerEntityState?: string,
         config?: any
       ): Breakdown[] => {
-        const breakdowns = Object.values(hass.areas)
+        let breakdowns = Object.values(hass.areas)
           .map((area: any): Breakdown | null => {
             const areaName = computeAreaName(area);
             if (!areaName) {
@@ -276,13 +277,18 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           const untrackedValue =
             Number(powerEntityState) -
             breakdowns.reduce((acc, bd) => acc + bd.value, 0);
-          if (untrackedValue > 0) {
+          if (untrackedValue > 0 || config?.breakdown_show_zero_values) {
             breakdowns.push({
               id: "untracked",
               name: "Untracked",
               value: untrackedValue,
             });
           }
+        }
+
+        // Filter out zero values if option is disabled
+        if (config?.breakdown_show_zero_values === false) {
+          breakdowns = breakdowns.filter((bd) => bd.value > 0);
         }
 
         // Sort breakdowns
@@ -312,7 +318,12 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     const gridRows = Number(this._config.grid_options?.rows ?? 3);
 
     const _computeEntityBreakdown = memoizeOne(
-      (hass: any, areaId: string, powerEntityId?: string): Breakdown[] => {
+      (
+        hass: any,
+        areaId: string,
+        powerEntityId?: string,
+        config?: any
+      ): Breakdown[] => {
         const powerEntityIds = Object.keys(hass.states).filter(
           generateEntityFilter(hass, {
             domain: "sensor",
@@ -331,13 +342,18 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
               !isNaN(Number(st.state))
           );
 
-        return validPowerEntities
-          .map((entity) => ({
-            id: entity.entity_id,
-            name: hass.states[entity.entity_id]?.attributes.friendly_name ?? "",
-            value: Number(entity.state),
-          }))
-          .sort((a, b) => b.value - a.value);
+        let entities = validPowerEntities.map((entity) => ({
+          id: entity.entity_id,
+          name: hass.states[entity.entity_id]?.attributes.friendly_name ?? "",
+          value: Number(entity.state),
+        }));
+
+        // Filter out zero values if option is disabled
+        if (config?.breakdown_show_zero_values === false) {
+          entities = entities.filter((entity) => entity.value > 0);
+        }
+
+        return entities.sort((a, b) => b.value - a.value);
       }
     );
 
@@ -461,7 +477,8 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                     ? _computeEntityBreakdown(
                         this.hass,
                         currentNavigation.id,
-                        entityId
+                        entityId,
+                        this._config
                       ).map(
                         (entity) => html`
                           <ha-md-list-item

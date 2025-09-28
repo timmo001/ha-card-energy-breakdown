@@ -109,6 +109,12 @@ export class EnergyBreakdownCardEditor extends LitElement {
               },
             },
             {
+              name: "breakdown_show_zero_values",
+              selector: {
+                boolean: {},
+              },
+            },
+            {
               name: "breakdown_sort",
               selector: {
                 select: {
@@ -144,6 +150,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
       header_current_show: true,
       header_day_show: true,
       breakdown_show_untracked: true,
+      breakdown_show_zero_values: false,
       breakdown_sort: "name-asc",
       ...config,
     };
@@ -201,6 +208,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Hide the 'Today' label below the daily energy display";
       case "breakdown_show_untracked":
         return "Whether to show untracked power consumption in the breakdown";
+      case "breakdown_show_zero_values":
+        return "Whether to show areas/entities with zero power consumption";
       case "breakdown_sort":
         return "Sort breakdown items by name or value";
       default:
@@ -232,6 +241,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Hide 'Today'";
       case "breakdown_show_untracked":
         return "Show Untracked";
+      case "breakdown_show_zero_values":
+        return "Show Zero Values";
       case "breakdown_sort":
         return "Sort";
       default:
