@@ -105,18 +105,14 @@ export class EnergyBreakdownCardEditor extends LitElement {
             {
               name: "breakdown_show_untracked",
               selector: {
-                select: {
-                  options: [
-                    { value: true, label: "Show" },
-                    { value: false, label: "Hide" },
-                  ],
-                },
+                boolean: {},
               },
             },
             {
               name: "breakdown_sort",
               selector: {
                 select: {
+                  mode: "dropdown",
                   options: [
                     { value: "name-asc", label: "Name (A-Z)" },
                     { value: "name-desc", label: "Name (Z-A)" },
