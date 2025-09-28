@@ -204,7 +204,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
       case "header_day_title_hide":
         return "Hide the 'Today' label below the daily energy display";
       case "breakdown_show_untracked":
-        return "Show untracked power consumption in the breakdown";
+        return "Whether to show untracked power consumption in the breakdown";
       case "breakdown_sort":
         return "Sort breakdown items by name or value";
       default:
