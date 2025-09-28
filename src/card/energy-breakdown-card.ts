@@ -388,11 +388,13 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                 "with-day-total": this._config?.header_day_show,
                 "breakdown-hidden": this._config?.breakdown_show === false,
               })}
-              @click=${this._handleHeadingClick}
             >
               ${this._config?.header_current_show
                 ? html`
-                    <div class="power-section">
+                    <div
+                      class="power-section"
+                      @click=${this._handleCurrentClick}
+                    >
                       <div class="section-value">
                         <ha-icon
                           class="icon"
@@ -421,7 +423,10 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                 : nothing}
               ${this._config?.header_day_show
                 ? html`
-                    <div class="day-total-section">
+                    <div
+                      class="day-total-section"
+                      @click=${this._handleDayTotalClick}
+                    >
                       <div class="section-value">
                         <ha-icon class="icon" .icon=${todayIcon}></ha-icon>
                         <span class="value"
@@ -519,9 +524,14 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     </ha-card>`;
   }
 
-  private _handleHeadingClick(): void {
+  private _handleCurrentClick(): void {
     if (!this._config?.power_entity) return;
     fireEvent(this, "hass-more-info", { entityId: this._config.power_entity });
+  }
+
+  private _handleDayTotalClick(): void {
+    if (!this._config?.header_day_show) return;
+    window.location.href = `/energy`;
   }
 
   private _handleAreaClick(area: Breakdown): void {
