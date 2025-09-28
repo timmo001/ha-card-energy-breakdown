@@ -157,7 +157,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
       case "power_entity":
         return "The entity to use for current power usage";
       case "header_current_icon":
-        return "The icon to display for the power entity";
+        return "The icon to display for current power usage";
       case "header_day_icon":
         return "The icon to display for the daily energy consumption";
       case "header_current_show":
