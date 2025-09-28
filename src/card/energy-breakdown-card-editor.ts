@@ -2,7 +2,7 @@ import { html, LitElement, nothing, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import memoizeOne from "memoize-one";
 import { assert } from "superstruct";
-import { HomeAssistant } from "../ha";
+import { configElementStyle, HomeAssistant } from "../ha";
 import { CARD_EDITOR_NAME, CARD_NAME } from "./const";
 import { HaFormSchema } from "../utils/form/ha-form";
 import {
@@ -28,28 +28,62 @@ export class EnergyBreakdownCardEditor extends LitElement {
           },
         },
         {
-          name: "power_icon",
-          selector: {
-            icon: {},
-          },
+          name: "appearance",
+          flatten: true,
+          type: "expandable",
+          iconPath: "mdi:eye",
+          schema: [
+            {
+              name: "",
+              type: "grid",
+              schema: [
+                {
+                  name: "power_icon",
+                  selector: {
+                    icon: {},
+                  },
+                },
+              ],
+            },
+          ],
         },
         {
-          name: "hide_day_total",
-          selector: {
-            boolean: {},
-          },
-        },
-        {
-          name: "hide_current_title",
-          selector: {
-            boolean: {},
-          },
-        },
-        {
-          name: "hide_daily_title",
-          selector: {
-            boolean: {},
-          },
+          name: "visibility",
+          flatten: true,
+          type: "expandable",
+          iconPath: "mdi:eye-off",
+          schema: [
+            {
+              name: "",
+              type: "grid",
+              schema: [
+                {
+                  name: "hide_day_total",
+                  selector: {
+                    boolean: {},
+                  },
+                },
+              ],
+            },
+            {
+              name: "",
+              type: "grid",
+              schema: [
+                {
+                  name: "hide_current_title",
+                  selector: {
+                    boolean: {},
+                  },
+                },
+                {
+                  name: "hide_daily_title",
+                  selector: {
+                    boolean: {},
+                  },
+                },
+              ],
+            },
+          ],
         },
       ] as const satisfies readonly HaFormSchema[]
   );
@@ -105,7 +139,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
       case "hide_day_total":
         return "Hide total energy consumption for the day so far";
       case "hide_current_title":
-        return "Hide the 'Current' label below the power display";
+        return "Hide the 'Current' label below the power usage display";
       case "hide_daily_title":
         return "Hide the 'Today' label below the daily energy display";
       default:
@@ -117,14 +151,18 @@ export class EnergyBreakdownCardEditor extends LitElement {
     switch (schema.name) {
       case "power_entity":
         return "Power Entity";
+      case "appearance":
+        return "Appearance";
+      case "visibility":
+        return "Visibility";
       case "power_icon":
         return "Power Icon";
       case "hide_day_total":
         return "Hide Day Total";
       case "hide_current_title":
-        return "Hide Current Title";
+        return "Hide 'Current'";
       case "hide_daily_title":
-        return "Hide Daily Title";
+        return "Hide 'Today'";
       default:
         return undefined;
     }
@@ -132,6 +170,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
 
   static get styles() {
     return [
+      configElementStyle,
       css`
         ha-form {
           display: block;

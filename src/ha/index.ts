@@ -8,6 +8,7 @@ export { deepEqual } from "./common/util/deep-equal";
 export { handleStructError } from "./common/structs/handle-errors";
 export { haStyleScrollbar } from "./resources/styles";
 export { actionConfigStruct } from "./panels/lovelace/editor/structs/action-struct";
+export { configElementStyle } from "./panels/lovelace/editor/config-elements/config-elements-style";
 export {
   isActive,
   isAvailable,
