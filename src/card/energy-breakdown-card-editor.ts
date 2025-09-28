@@ -182,7 +182,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
       case "visibility":
         return "Header";
       case "header_current_icon":
-        return "Power Icon";
+        return "Current Icon";
       case "header_day_icon":
         return "Today Icon";
       case "header_current_show":
