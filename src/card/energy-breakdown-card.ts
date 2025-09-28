@@ -1,6 +1,8 @@
 import { css, CSSResultGroup, html, nothing, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
+import memoizeOne from "memoize-one";
+import { assert } from "superstruct";
 import {
   computeAreaName,
   fireEvent,
@@ -12,7 +14,6 @@ import {
   LovelaceCard,
   LovelaceCardEditor,
 } from "../ha";
-
 import { BaseElement } from "../utils/base-element";
 import { cardStyle } from "../utils/card-styles";
 import { registerCustomCard } from "../utils/custom-cards";
@@ -22,8 +23,10 @@ import {
   CARD_EDITOR_NAME,
   CARD_NAME,
 } from "./const";
-import { EnergyBreakdownCardConfig } from "./energy-breakdown-card-config";
-import memoizeOne from "memoize-one";
+import {
+  EnergyBreakdownCardConfig,
+  energyBreakdownCardConfigStruct,
+} from "./energy-breakdown-card-config";
 
 interface Breakdown {
   id: string;
@@ -51,9 +54,9 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
   }
 
   public setConfig(config: EnergyBreakdownCardConfig): void {
-    this._config = {
-      ...config,
-    };
+    assert(config, energyBreakdownCardConfigStruct);
+    this._config = { ...config };
+    setTimeout(() => this.requestUpdate(), 0);
   }
 
   @property({ attribute: false }) public hass!: HomeAssistant;
@@ -62,7 +65,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   protected willUpdate(changedProps: PropertyValues): void {
     super.willUpdate(changedProps);
-    if (changedProps.has("hass") && !this._config?.hide_day_total) {
+    if (changedProps.has("hass") && this._config?.header_day) {
       this._fetchDayTotal();
     }
   }
@@ -112,7 +115,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
   }
 
   private async _fetchDayTotal(): Promise<void> {
-    if (this._config?.hide_day_total || !this.hass) {
+    if (!this._config?.header_day || !this.hass) {
       this._dayTotal = null;
       return;
     }
@@ -201,6 +204,10 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     const powerEntityIcon = this._config.power_icon?.length
       ? this._config.power_icon
       : "mdi:lightning-bolt";
+
+    const todayIcon = this._config.today_icon?.length
+      ? this._config.today_icon
+      : "mdi:calendar-today";
 
     const _computeBreakdown = memoizeOne(
       (
@@ -305,7 +312,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       this._currentView === "entities" && currentNavigation;
 
     return html`<ha-card>
-      ${stateObj || !this._config?.hide_day_total
+      ${(stateObj && this._config?.header_current) || this._config?.header_day
         ? html`
             <div
               class=${classMap({
@@ -316,7 +323,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
               })}
               @click=${this._handleHeadingClick}
             >
-              ${stateObj
+              ${stateObj && this._config?.header_current
                 ? html`
                     <div class="power-section">
                       <div class="section-value">
@@ -337,14 +344,11 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                     </div>
                   `
                 : nothing}
-              ${!this._config?.hide_day_total
+              ${this._config?.header_day
                 ? html`
                     <div class="day-total-section">
                       <div class="section-value">
-                        <ha-icon
-                          class="icon"
-                          icon="mdi:calendar-today"
-                        ></ha-icon>
+                        <ha-icon class="icon" .icon=${todayIcon}></ha-icon>
                         <span class="value"
                           >${this._dayTotal !== null
                             ? formatNumber(this._dayTotal, this.hass.locale, {
