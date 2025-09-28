@@ -1,4 +1,4 @@
-import { css, CSSResultGroup, html, nothing } from "lit";
+import { css, CSSResultGroup, html, nothing, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import {
@@ -12,6 +12,7 @@ import {
   LovelaceCard,
   LovelaceCardEditor,
 } from "../ha";
+
 import { BaseElement } from "../utils/base-element";
 import { cardStyle } from "../utils/card-styles";
 import { registerCustomCard } from "../utils/custom-cards";
@@ -59,6 +60,13 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   @state() private _config?: any;
 
+  protected willUpdate(changedProps: PropertyValues): void {
+    super.willUpdate(changedProps);
+    if (changedProps.has("hass") && !this._config?.hide_day_total) {
+      this._fetchDayTotal();
+    }
+  }
+
   @state() private _navigationStack: {
     type: "area" | "entity";
     id?: string;
@@ -66,6 +74,8 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
   }[] = [];
 
   @state() private _currentView: "areas" | "entities" = "areas";
+
+  @state() private _dayTotal: number | null = null;
 
   public static async getStubConfig(
     hass: HomeAssistant
@@ -99,6 +109,66 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   public getCardSize(): number {
     return 3;
+  }
+
+  private async _fetchDayTotal(): Promise<void> {
+    if (this._config?.hide_day_total || !this.hass) {
+      this._dayTotal = null;
+      return;
+    }
+
+    try {
+      // Get all energy sensors (device_class: energy, state_class: total_increasing)
+      const energySensors = Object.keys(this.hass.states).filter((entityId) => {
+        const state = this.hass.states[entityId];
+        return (
+          state &&
+          state.attributes.device_class === "energy" &&
+          state.attributes.state_class === "total_increasing"
+        );
+      });
+
+      if (energySensors.length === 0) {
+        this._dayTotal = null;
+        return;
+      }
+
+      // Get start of current day
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      // Fetch statistics for today using WebSocket API
+      const stats = await this.hass.callWS<{
+        [entityId: string]: Array<{
+          start: number;
+          end: number;
+          change?: number | null;
+        }>;
+      }>({
+        type: "recorder/statistics_during_period",
+        start_time: startOfDay.toISOString(),
+        end_time: new Date().toISOString(),
+        statistic_ids: energySensors,
+        period: "hour",
+        units: { energy: "kWh" },
+        types: ["change"],
+      });
+
+      // Calculate total energy consumption for the day
+      let totalEnergy = 0;
+      for (const entityStats of Object.values(stats)) {
+        for (const stat of entityStats) {
+          if (stat.change !== null && stat.change !== undefined) {
+            totalEnergy += stat.change;
+          }
+        }
+      }
+
+      this._dayTotal = totalEnergy;
+    } catch (error) {
+      console.error("Error fetching day total energy:", error);
+      this._dayTotal = null;
+    }
   }
 
   public getGridOptions(): any {
@@ -235,23 +305,57 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       this._currentView === "entities" && currentNavigation;
 
     return html`<ha-card>
-      ${stateObj
+      ${stateObj || !this._config?.hide_day_total
         ? html`
             <div
               class=${classMap({
                 heading: true,
                 "reduced-padding": gridRows < 3,
                 "single-row": gridRows === 1,
+                "with-day-total": !this._config?.hide_day_total,
               })}
               @click=${this._handleHeadingClick}
             >
-              <ha-icon class="icon" .icon=${powerEntityIcon}></ha-icon>
-              <span class="value"
-                >${formatNumber(stateObj?.state, this.hass.locale, {
-                  maximumFractionDigits: 1,
-                })}</span
-              >
-              <span class="measurement">${uom}</span>
+              ${stateObj
+                ? html`
+                    <div class="power-section">
+                      <div class="section-value">
+                        <ha-icon
+                          class="icon"
+                          .icon=${powerEntityIcon}
+                        ></ha-icon>
+                        <span class="value"
+                          >${formatNumber(stateObj?.state, this.hass.locale, {
+                            maximumFractionDigits: 1,
+                          })}</span
+                        >
+                        <span class="measurement">${uom}</span>
+                      </div>
+                      <div class="section-label">Current</div>
+                    </div>
+                  `
+                : nothing}
+              ${!this._config?.hide_day_total
+                ? html`
+                    <div class="day-total-section">
+                      <div class="section-value">
+                        <ha-icon
+                          class="icon"
+                          icon="mdi:calendar-today"
+                        ></ha-icon>
+                        <span class="value"
+                          >${this._dayTotal !== null
+                            ? formatNumber(this._dayTotal, this.hass.locale, {
+                                maximumFractionDigits: 1,
+                              })
+                            : "--"}</span
+                        >
+                        <span class="measurement">kWh</span>
+                      </div>
+                      <div class="section-label">Today</div>
+                    </div>
+                  `
+                : nothing}
             </div>
           `
         : nothing}
@@ -393,6 +497,50 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           pointer-events: all;
           cursor: pointer;
           line-height: var(--ha-line-height-normal);
+        }
+
+        .heading.with-day-total {
+          justify-content: space-around;
+          width: 100%;
+          gap: 16px;
+        }
+
+        .power-section,
+        .day-total-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .section-label {
+          font-size: var(--ha-font-size-body-2);
+          color: var(--secondary-text-color);
+          line-height: var(--ha-line-height-body-2);
+          text-align: center;
+        }
+
+        .section-value {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
+
+        .section-value .icon {
+          --mdc-icon-size: var(--ha-font-size-3xl);
+        }
+
+        .section-value .value {
+          font-size: var(--ha-font-size-5xl);
+          font-weight: var(--ha-font-weight-light);
+          color: var(--primary-text-color);
+        }
+
+        .section-value .measurement {
+          padding-bottom: 10px;
+          align-self: flex-end;
+          font-size: var(--ha-font-size-xl);
+          color: var(--secondary-text-color);
         }
         .heading.reduced-padding {
           padding: 8px 8px 0;
