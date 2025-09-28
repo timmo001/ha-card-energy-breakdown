@@ -331,7 +331,9 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                         >
                         <span class="measurement">${uom}</span>
                       </div>
-                      <div class="section-label">Current</div>
+                      ${!this._config?.hide_current_title
+                        ? html`<div class="section-label">Current</div>`
+                        : nothing}
                     </div>
                   `
                 : nothing}
@@ -352,7 +354,9 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                         >
                         <span class="measurement">kWh</span>
                       </div>
-                      <div class="section-label">Today</div>
+                      ${!this._config?.hide_daily_title
+                        ? html`<div class="section-label">Today</div>`
+                        : nothing}
                     </div>
                   `
                 : nothing}

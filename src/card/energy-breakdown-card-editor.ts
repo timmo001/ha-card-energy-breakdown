@@ -39,6 +39,18 @@ export class EnergyBreakdownCardEditor extends LitElement {
             boolean: {},
           },
         },
+        {
+          name: "hide_current_title",
+          selector: {
+            boolean: {},
+          },
+        },
+        {
+          name: "hide_daily_title",
+          selector: {
+            boolean: {},
+          },
+        },
       ] as const satisfies readonly HaFormSchema[]
   );
 
@@ -92,6 +104,10 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "An icon to display for the power entity";
       case "hide_day_total":
         return "Hide total energy consumption for the day so far";
+      case "hide_current_title":
+        return "Hide the 'Current' label below the power display";
+      case "hide_daily_title":
+        return "Hide the 'Today' label below the daily energy display";
       default:
         return undefined;
     }
@@ -105,6 +121,10 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Power Icon";
       case "hide_day_total":
         return "Hide Day Total";
+      case "hide_current_title":
+        return "Hide Current Title";
+      case "hide_daily_title":
+        return "Hide Daily Title";
       default:
         return undefined;
     }
