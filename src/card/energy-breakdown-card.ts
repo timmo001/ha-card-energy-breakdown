@@ -60,6 +60,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     this._config = {
       header_current_show: true,
       header_day_show: true,
+      breakdown_show: true,
       breakdown_show_untracked: true,
       breakdown_show_zero_values: false,
       breakdown_sort: "name-asc",
@@ -122,7 +123,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
   }
 
   public getCardSize(): number {
-    return 3;
+    return 6;
   }
 
   private async _fetchDayTotal(): Promise<void> {
@@ -198,10 +199,10 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   public getGridOptions(): any {
     return {
-      columns: 6,
+      columns: 9,
       rows: 3,
-      min_columns: 4,
-      min_rows: 1,
+      min_columns: 8,
+      min_rows: 2,
     };
   }
 
@@ -377,8 +378,8 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
               class=${classMap({
                 heading: true,
                 "reduced-padding": gridRows < 3,
-                "single-row": gridRows === 1,
                 "with-day-total": this._config?.header_day_show,
+                "breakdown-hidden": !this._config?.breakdown_show,
               })}
               @click=${this._handleHeadingClick}
             >
@@ -434,7 +435,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
             </div>
           `
         : nothing}
-      ${gridRows > 1 || !currentStateObj
+      ${this._config?.breakdown_show
         ? html`
             <div class="breakdown ha-scrollbar">
               ${showBackButton
@@ -579,6 +580,10 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           justify-content: space-around;
           width: 100%;
           gap: 16px;
+        }
+
+        .heading.breakdown-hidden {
+          width: 100%;
         }
 
         .power-section,

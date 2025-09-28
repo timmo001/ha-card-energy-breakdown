@@ -17,6 +17,7 @@ export interface EnergyBreakdownCardConfig extends LovelaceCardConfig {
   header_day_icon?: string;
   header_current_title_hide?: boolean;
   header_day_title_hide?: boolean;
+  breakdown_show?: boolean;
   breakdown_show_untracked?: boolean;
   breakdown_show_zero_values?: boolean;
   breakdown_sort?: "name-asc" | "name-desc" | "value-asc" | "value-desc";
@@ -32,6 +33,7 @@ export const energyBreakdownCardConfigStruct = assign(
     header_day_icon: optional(string()),
     header_current_title_hide: optional(boolean()),
     header_day_title_hide: optional(boolean()),
+    breakdown_show: optional(defaulted(boolean(), true)),
     breakdown_show_untracked: optional(defaulted(boolean(), true)),
     breakdown_show_zero_values: optional(defaulted(boolean(), false)),
     breakdown_sort: optional(defaulted(string(), "name-asc")),

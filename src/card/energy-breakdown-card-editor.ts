@@ -96,11 +96,18 @@ export class EnergyBreakdownCardEditor extends LitElement {
           ],
         },
         {
+          name: "breakdown_show",
+          selector: {
+            boolean: {},
+          },
+        },
+        {
           name: "breakdown",
           flatten: true,
           type: "expandable",
           icon: "mdi:format-list-bulleted",
           expanded: true,
+          disabled: !config.breakdown_show,
           schema: [
             {
               name: "breakdown_show_untracked",
@@ -149,6 +156,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
     this._config = {
       header_current_show: true,
       header_day_show: true,
+      breakdown_show: true,
       breakdown_show_untracked: true,
       breakdown_show_zero_values: false,
       breakdown_sort: "name-asc",
@@ -206,6 +214,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Hide the 'Current' label below the power usage display";
       case "header_day_title_hide":
         return "Hide the 'Today' label below the daily energy display";
+      case "breakdown_show":
+        return "Show the breakdown section with power consumption by area";
       case "breakdown_show_untracked":
         return "Whether to show untracked power consumption in the breakdown";
       case "breakdown_show_zero_values":
@@ -239,6 +249,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Hide 'Current'";
       case "header_day_title_hide":
         return "Hide 'Today'";
+      case "breakdown_show":
+        return "Show Breakdown";
       case "breakdown_show_untracked":
         return "Show Untracked";
       case "breakdown_show_zero_values":
