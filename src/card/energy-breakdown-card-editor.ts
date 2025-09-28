@@ -2,7 +2,7 @@ import { html, LitElement, nothing, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import memoizeOne from "memoize-one";
 import { assert } from "superstruct";
-import { computeAreaName, configElementStyle, HomeAssistant } from "../ha";
+import { configElementStyle, HomeAssistant } from "../ha";
 import { CARD_EDITOR_NAME, CARD_NAME } from "./const";
 import { HaFormSchema } from "../utils/form/ha-form";
 import {
@@ -17,17 +17,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
   @state() private _config?: EnergyBreakdownCardConfig;
 
   private _schema = memoizeOne(
-    (config: EnergyBreakdownCardConfig, hass?: HomeAssistant) => {
-      const areaOptions = hass
-        ? Object.values(hass.areas)
-            .map((area) => ({
-              value: area.area_id,
-              label: computeAreaName(area) || area.area_id,
-            }))
-            .sort((a, b) => a.label.localeCompare(b.label))
-        : [];
-
-      return [
+    (config: EnergyBreakdownCardConfig) =>
+      [
         {
           name: "power_entity",
           selector: {
@@ -118,16 +109,6 @@ export class EnergyBreakdownCardEditor extends LitElement {
               },
             },
             {
-              name: "breakdown_always_include_areas",
-              selector: {
-                select: {
-                  multiple: true,
-                  mode: "dropdown",
-                  options: areaOptions,
-                },
-              },
-            },
-            {
               name: "breakdown_sort",
               selector: {
                 select: {
@@ -143,8 +124,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
             },
           ],
         },
-      ] as const satisfies readonly HaFormSchema[];
-    }
+      ] as const satisfies readonly HaFormSchema[]
   );
 
   public setConfig(config: EnergyBreakdownCardConfig): void {
@@ -164,7 +144,6 @@ export class EnergyBreakdownCardEditor extends LitElement {
       header_current_show: true,
       header_day_show: true,
       breakdown_show_untracked: true,
-      breakdown_always_include_areas: [],
       breakdown_sort: "name-asc",
       ...config,
     };
@@ -175,7 +154,7 @@ export class EnergyBreakdownCardEditor extends LitElement {
       return nothing;
     }
 
-    const schema = this._schema(this._config, this.hass);
+    const schema = this._schema(this._config);
 
     return html`
       <ha-form
@@ -222,8 +201,6 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Hide the 'Today' label below the daily energy display";
       case "breakdown_show_untracked":
         return "Whether to show untracked power consumption in the breakdown";
-      case "breakdown_always_include_areas":
-        return "Select areas to always include in the breakdown, even if they have no power consumption. Areas with active power usage are always shown.";
       case "breakdown_sort":
         return "Sort breakdown items by name or value";
       default:
@@ -255,8 +232,6 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Hide 'Today'";
       case "breakdown_show_untracked":
         return "Show Untracked";
-      case "breakdown_always_include_areas":
-        return "Always include areas";
       case "breakdown_sort":
         return "Sort";
       default:

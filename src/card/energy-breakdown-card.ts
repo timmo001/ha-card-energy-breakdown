@@ -59,7 +59,6 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       header_current_show: true,
       header_day_show: true,
       breakdown_show_untracked: true,
-      breakdown_always_include_areas: [],
       breakdown_sort: "name-asc",
       ...config,
     };
@@ -260,23 +259,12 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
               0
             );
 
-            // Always show areas with power consumption > 0
-            if (validPowerEntities.length > 0 && !isNaN(sum) && sum > 0) {
+            // Only show areas that have power sensors
+            if (validPowerEntities.length > 0) {
               return {
                 id: area.area_id,
                 name: areaName,
                 value: sum,
-              };
-            }
-
-            // Show empty areas only if they're explicitly included
-            if (
-              config?.breakdown_always_include_areas?.includes(area.area_id)
-            ) {
-              return {
-                id: area.area_id,
-                name: areaName,
-                value: 0,
               };
             }
 
