@@ -58,6 +58,8 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     this._config = {
       header_current_show: true,
       header_day_show: true,
+      breakdown_show_untracked: true,
+      breakdown_sort: "name-asc",
       ...config,
     };
     if (this.hass && this._config?.header_day_show) {
@@ -224,7 +226,8 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       (
         hass: any,
         powerEntityId?: string,
-        powerEntityState?: string
+        powerEntityState?: string,
+        config?: any
       ): Breakdown[] => {
         const breakdowns = Object.values(hass.areas)
           .map((area: any): Breakdown | null => {
@@ -270,15 +273,32 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           })
           .filter((bd): bd is Breakdown => bd !== null);
 
-        if (powerEntityState) {
-          breakdowns.push({
-            id: "untracked",
-            name: "Untracked",
-            value:
-              Number(powerEntityState) -
-              breakdowns.reduce((acc, bd) => acc + bd.value, 0),
-          });
+        if (powerEntityState && config?.breakdown_show_untracked !== false) {
+          const untrackedValue =
+            Number(powerEntityState) -
+            breakdowns.reduce((acc, bd) => acc + bd.value, 0);
+          if (untrackedValue > 0) {
+            breakdowns.push({
+              id: "untracked",
+              name: "Untracked",
+              value: untrackedValue,
+            });
+          }
         }
+
+        // Sort breakdowns
+        const sortOption = config?.breakdown_sort || "name-asc";
+        const [sortBy, sortOrder] = sortOption.split("-");
+
+        breakdowns.sort((a, b) => {
+          let comparison = 0;
+          if (sortBy === "value") {
+            comparison = a.value - b.value;
+          } else {
+            comparison = a.name.localeCompare(b.name);
+          }
+          return sortOrder === "desc" ? -comparison : comparison;
+        });
 
         return breakdowns;
       }
@@ -287,7 +307,8 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     const breakdown = _computeBreakdown(
       this.hass,
       entityId,
-      currentStateObj?.state
+      currentStateObj?.state,
+      this._config
     );
     const gridRows = Number(this._config.grid_options?.rows ?? 3);
 

@@ -95,6 +95,39 @@ export class EnergyBreakdownCardEditor extends LitElement {
             },
           ],
         },
+        {
+          name: "breakdown",
+          flatten: true,
+          type: "expandable",
+          icon: "mdi:format-list-bulleted",
+          expanded: true,
+          schema: [
+            {
+              name: "breakdown_show_untracked",
+              selector: {
+                select: {
+                  options: [
+                    { value: true, label: "Show" },
+                    { value: false, label: "Hide" },
+                  ],
+                },
+              },
+            },
+            {
+              name: "breakdown_sort",
+              selector: {
+                select: {
+                  options: [
+                    { value: "name-asc", label: "Name (A-Z)" },
+                    { value: "name-desc", label: "Name (Z-A)" },
+                    { value: "value-asc", label: "Value (Low to High)" },
+                    { value: "value-desc", label: "Value (High to Low)" },
+                  ],
+                },
+              },
+            },
+          ],
+        },
       ] as const satisfies readonly HaFormSchema[]
   );
 
@@ -114,6 +147,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
     this._config = {
       header_current_show: true,
       header_day_show: true,
+      breakdown_show_untracked: true,
+      breakdown_sort: "name-asc",
       ...config,
     };
   }
@@ -168,6 +203,10 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Hide the 'Current' label below the power usage display";
       case "header_day_title_hide":
         return "Hide the 'Today' label below the daily energy display";
+      case "breakdown_show_untracked":
+        return "Show untracked power consumption in the breakdown";
+      case "breakdown_sort":
+        return "Sort breakdown items by name or value";
       default:
         return undefined;
     }
@@ -181,6 +220,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Appearance";
       case "visibility":
         return "Header";
+      case "breakdown":
+        return "Breakdown";
       case "header_current_icon":
         return "Current Icon";
       case "header_day_icon":
@@ -193,6 +234,10 @@ export class EnergyBreakdownCardEditor extends LitElement {
         return "Hide 'Current'";
       case "header_day_title_hide":
         return "Hide 'Today'";
+      case "breakdown_show_untracked":
+        return "Show Untracked";
+      case "breakdown_sort":
+        return "Sort";
       default:
         return undefined;
     }
