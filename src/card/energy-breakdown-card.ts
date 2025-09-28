@@ -28,6 +28,8 @@ import {
   energyBreakdownCardConfigStruct,
 } from "./energy-breakdown-card-config";
 
+const FETCH_INTERVAL = 60000; // 60 seconds
+
 interface Breakdown {
   id: string;
   name: string;
@@ -69,13 +71,6 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   @state() private _config?: any;
 
-  protected willUpdate(changedProps: PropertyValues): void {
-    super.willUpdate(changedProps);
-    if (changedProps.has("_config") && this._config?.header_day_show) {
-      this._fetchDayTotal();
-    }
-  }
-
   @state() private _navigationStack: {
     type: "area" | "entity";
     id?: string;
@@ -85,6 +80,16 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
   @state() private _currentView: "areas" | "entities" = "areas";
 
   @state() private _dayTotal: number | null = null;
+
+  private _fetchInterval?: number;
+
+  protected willUpdate(changedProps: PropertyValues): void {
+    super.willUpdate(changedProps);
+    if (changedProps.has("_config") && this._config?.header_day_show) {
+      this._fetchDayTotal();
+      this._startPeriodicFetch();
+    }
+  }
 
   public static async getStubConfig(
     hass: HomeAssistant
@@ -178,6 +183,17 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       console.error("Error fetching day total energy:", error);
       this._dayTotal = null;
     }
+  }
+
+  private _startPeriodicFetch(): void {
+    if (this._fetchInterval) {
+      clearInterval(this._fetchInterval);
+      this._fetchInterval = undefined;
+    }
+
+    this._fetchInterval = window.setInterval(() => {
+      this._fetchDayTotal();
+    }, FETCH_INTERVAL);
   }
 
   public getGridOptions(): any {
