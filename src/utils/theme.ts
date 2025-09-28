@@ -32,7 +32,10 @@ export const themeVariables = css`
     --energy-card-secondary-color,
     var(--primary-text-color)
   );
-  --card-primary-letter-spacing: var(--energy-card-primary-letter-spacing, 0.1px);
+  --card-primary-letter-spacing: var(
+    --energy-card-primary-letter-spacing,
+    0.1px
+  );
   --card-secondary-letter-spacing: var(
     --energy-card-secondary-letter-spacing,
     0.4px
@@ -176,7 +179,10 @@ export const themeColorCss = css`
   );
 
   /* State lock colors */
-  --rgb-state-lock-locked: var(--energy-rgb-state-lock-locked, var(--rgb-green));
+  --rgb-state-lock-locked: var(
+    --energy-rgb-state-lock-locked,
+    var(--rgb-green)
+  );
   --rgb-state-lock-unlocked: var(
     --energy-rgb-state-lock-unlocked,
     var(--rgb-red)
@@ -198,8 +204,14 @@ export const themeColorCss = css`
     --energy-rgb-state-climate-auto,
     var(--rgb-green)
   );
-  --rgb-state-climate-cool: var(--energy-rgb-state-climate-cool, var(--rgb-blue));
-  --rgb-state-climate-dry: var(--energy-rgb-state-climate-dry, var(--rgb-orange));
+  --rgb-state-climate-cool: var(
+    --energy-rgb-state-climate-cool,
+    var(--rgb-blue)
+  );
+  --rgb-state-climate-dry: var(
+    --energy-rgb-state-climate-dry,
+    var(--rgb-orange)
+  );
   --rgb-state-climate-fan-only: var(
     --energy-rgb-state-climate-fan-only,
     var(--rgb-teal)
