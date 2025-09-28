@@ -96,6 +96,16 @@ export class EnergyBreakdownCardEditor extends LitElement {
   public setConfig(config: EnergyBreakdownCardConfig): void {
     assert(config, energyBreakdownCardConfigStruct);
 
+    if (config.header_current_show === false) {
+      delete config.header_current_icon;
+      delete config.header_current_title_hide;
+    }
+
+    if (config.header_day_show === false) {
+      delete config.header_day_icon;
+      delete config.header_day_title_hide;
+    }
+
     this._config = {
       header_current_show: true,
       header_day_show: true,
