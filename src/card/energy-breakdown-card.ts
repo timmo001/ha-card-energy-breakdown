@@ -378,7 +378,11 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     const showBackButton =
       this._currentView === "entities" && currentNavigation;
 
-    return html`<ha-card>
+    return html`<ha-card
+      class=${classMap({
+        "hide-background": this._config?.hide_background === true,
+      })}
+    >
       ${this._config?.header_current_show || this._config?.header_day_show
         ? html`
             <div
@@ -578,6 +582,12 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           align-items: center;
           justify-content: flex-start;
           gap: 8px;
+        }
+
+        ha-card.hide-background {
+          background: transparent;
+          box-shadow: none;
+          border: none;
         }
 
         .heading {

@@ -27,6 +27,12 @@ export class EnergyBreakdownCardEditor extends LitElement {
             },
           },
         },
+        {
+          name: "hide_background",
+          selector: {
+            boolean: {},
+          },
+        },
 
         {
           name: "visibility",
@@ -202,6 +208,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
     switch (schema.name) {
       case "power_entity":
         return "The entity to use for current power usage";
+      case "hide_background":
+        return "Hide the card background and border";
       case "header_current_icon":
         return "The icon to display for current power usage";
       case "header_day_icon":
@@ -231,6 +239,8 @@ export class EnergyBreakdownCardEditor extends LitElement {
     switch (schema.name) {
       case "power_entity":
         return "Power Entity";
+      case "hide_background":
+        return "Hide Background";
       case "appearance":
         return "Appearance";
       case "visibility":
