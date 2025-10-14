@@ -11,6 +11,7 @@ import {
   haStyleScrollbar,
   HomeAssistant,
   isNumericState,
+  isUnavailableState,
   LovelaceCard,
   LovelaceCardEditor,
 } from "../ha";
@@ -406,17 +407,22 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                         ></ha-icon>
                         <span class="value"
                           >${currentStateObj
-                            ? formatNumber(
-                                currentStateObj.state,
-                                this.hass.locale,
-                                {
-                                  maximumFractionDigits: 1,
-                                }
-                              )
+                            ? isUnavailableState(currentStateObj.state)
+                              ? "N/A"
+                              : formatNumber(
+                                  currentStateObj.state,
+                                  this.hass.locale,
+                                  {
+                                    maximumFractionDigits: 1,
+                                  }
+                                )
                             : "--.-"}</span
                         >
                         <span class="measurement"
-                          >${currentStateObj ? uom : "W"}</span
+                          >${currentStateObj &&
+                          !isUnavailableState(currentStateObj.state)
+                            ? uom
+                            : "W"}</span
                         >
                       </div>
                       ${!this._config?.header_current_title_hide && gridRows > 1

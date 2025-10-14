@@ -15,6 +15,7 @@ export {
   isUnknown,
   getEntityPicture,
   isNumericState,
+  isUnavailableState,
 } from "./data/entity";
 export type {
   HomeAssistant,
