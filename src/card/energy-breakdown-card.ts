@@ -306,7 +306,12 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           breakdowns = breakdowns.filter((bd) => bd.value > 0);
         }
 
-        // Sort breakdowns
+        // Separate untracked item from the rest
+        const untrackedIndex = breakdowns.findIndex((bd) => bd.id === "untracked");
+        const untrackedItem =
+          untrackedIndex >= 0 ? breakdowns.splice(untrackedIndex, 1)[0] : null;
+
+        // Sort breakdowns (excluding untracked)
         const sortOption = config?.breakdown_sort || "name-asc";
         const [sortBy, sortOrder] = sortOption.split("-");
 
@@ -319,6 +324,11 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           }
           return sortOrder === "desc" ? -comparison : comparison;
         });
+
+        // Always append untracked at the bottom
+        if (untrackedItem) {
+          breakdowns.push(untrackedItem);
+        }
 
         return breakdowns;
       }
