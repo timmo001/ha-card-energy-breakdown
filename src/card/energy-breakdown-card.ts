@@ -487,9 +487,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                 ${this._currentView === "areas"
                   ? breakdown.map(
                       (area, idx) => html`
-                        ${breakdown.length > 1 &&
-                        idx === breakdown.length - 1 &&
-                        area.id !== "untracked"
+                        ${area.id === "untracked" && idx > 0
                           ? html`<ha-md-divider
                               role="separator"
                               tabindex="-1"
