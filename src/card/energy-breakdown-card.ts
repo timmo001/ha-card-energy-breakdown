@@ -307,7 +307,9 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         }
 
         // Separate untracked item from the rest
-        const untrackedIndex = breakdowns.findIndex((bd) => bd.id === "untracked");
+        const untrackedIndex = breakdowns.findIndex(
+          (bd) => bd.id === "untracked"
+        );
         const untrackedItem =
           untrackedIndex >= 0 ? breakdowns.splice(untrackedIndex, 1)[0] : null;
 
