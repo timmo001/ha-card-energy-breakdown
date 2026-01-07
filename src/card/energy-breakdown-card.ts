@@ -35,6 +35,19 @@ interface Breakdown {
   id: string;
   name: string;
   value: number;
+  floor_id?: string;
+}
+
+interface FloorGroup {
+  floor_id: string | null;
+  floor_name: string;
+  floor_level: number | null;
+  areas: Breakdown[];
+}
+
+interface GroupedBreakdown {
+  floorGroups: FloorGroup[];
+  untracked: Breakdown | null;
 }
 
 declare global {
@@ -244,7 +257,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         powerEntityId?: string,
         powerEntityState?: string,
         config?: any
-      ): Breakdown[] => {
+      ): GroupedBreakdown => {
         let breakdowns = Object.values(hass.areas)
           .map((area: any): Breakdown | null => {
             const areaName = computeAreaName(area);
@@ -281,6 +294,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                 id: area.area_id,
                 name: areaName,
                 value: sum,
+                floor_id: area.floor_id,
               };
             }
 
@@ -288,16 +302,18 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           })
           .filter((bd): bd is Breakdown => bd !== null);
 
+        // Calculate untracked value before filtering
+        let untrackedItem: Breakdown | null = null;
         if (powerEntityState && config?.breakdown_show_untracked !== false) {
           const untrackedValue =
             Number(powerEntityState) -
             breakdowns.reduce((acc, bd) => acc + bd.value, 0);
           if (untrackedValue > 0 || config?.breakdown_show_zero_values) {
-            breakdowns.push({
+            untrackedItem = {
               id: "untracked",
               name: "Untracked",
               value: untrackedValue,
-            });
+            };
           }
         }
 
@@ -306,18 +322,27 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           breakdowns = breakdowns.filter((bd) => bd.value > 0);
         }
 
-        // Separate untracked item from the rest
-        const untrackedIndex = breakdowns.findIndex(
-          (bd) => bd.id === "untracked"
-        );
-        const untrackedItem =
-          untrackedIndex >= 0 ? breakdowns.splice(untrackedIndex, 1)[0] : null;
+        // Group areas by floor
+        const floorGroupsMap = new Map<string | null, Breakdown[]>();
+        const noFloorAreas: Breakdown[] = [];
 
-        // Sort breakdowns (excluding untracked)
+        for (const breakdown of breakdowns) {
+          const floorId = (breakdown as any).floor_id || null;
+          if (floorId === null) {
+            noFloorAreas.push(breakdown);
+          } else {
+            if (!floorGroupsMap.has(floorId)) {
+              floorGroupsMap.set(floorId, []);
+            }
+            floorGroupsMap.get(floorId)!.push(breakdown);
+          }
+        }
+
+        // Sort areas within each floor group
         const sortOption = config?.breakdown_sort || "name-asc";
         const [sortBy, sortOrder] = sortOption.split("-");
 
-        breakdowns.sort((a, b) => {
+        const sortBreakdowns = (a: Breakdown, b: Breakdown) => {
           let comparison = 0;
           if (sortBy === "value") {
             comparison = a.value - b.value;
@@ -325,14 +350,62 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
             comparison = a.name.localeCompare(b.name);
           }
           return sortOrder === "desc" ? -comparison : comparison;
+        };
+
+        // Sort areas in each floor group
+        floorGroupsMap.forEach((areas) => {
+          areas.sort(sortBreakdowns);
+        });
+        noFloorAreas.sort(sortBreakdowns);
+
+        // Create floor groups with floor information
+        const floorGroups: FloorGroup[] = [];
+
+        // Add floors with level information
+        const floorsWithLevel: FloorGroup[] = [];
+        const floorsWithoutLevel: FloorGroup[] = [];
+
+        floorGroupsMap.forEach((areas, floorId) => {
+          const floor = floorId && hass.floors ? hass.floors[floorId] : undefined;
+          if (floor) {
+            const floorGroup: FloorGroup = {
+              floor_id: floorId,
+              floor_name: floor.name,
+              floor_level: floor.level ?? null,
+              areas: areas,
+            };
+            if (floor.level !== null && floor.level !== undefined) {
+              floorsWithLevel.push(floorGroup);
+            } else {
+              floorsWithoutLevel.push(floorGroup);
+            }
+          }
         });
 
-        // Always append untracked at the bottom
-        if (untrackedItem) {
-          breakdowns.push(untrackedItem);
+        // Sort floors by level (ascending)
+        floorsWithLevel.sort((a, b) => {
+          const levelA = a.floor_level ?? Infinity;
+          const levelB = b.floor_level ?? Infinity;
+          return levelA - levelB;
+        });
+
+        // Add floors with levels first, then floors without levels
+        floorGroups.push(...floorsWithLevel, ...floorsWithoutLevel);
+
+        // Add "No Floor" group at the end if there are areas without floors
+        if (noFloorAreas.length > 0) {
+          floorGroups.push({
+            floor_id: null,
+            floor_name: "No Floor",
+            floor_level: null,
+            areas: noFloorAreas,
+          });
         }
 
-        return breakdowns;
+        return {
+          floorGroups,
+          untracked: untrackedItem,
+        };
       }
     );
 
@@ -487,33 +560,77 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                 : nothing}
               <ha-md-list>
                 ${this._currentView === "areas"
-                  ? breakdown.map(
-                      (area, idx) => html`
-                        ${area.id === "untracked" && idx > 0
-                          ? html`<ha-md-divider
-                              role="separator"
-                              tabindex="-1"
-                            ></ha-md-divider>`
-                          : nothing}
-                        <ha-md-list-item
-                          class=${classMap({
-                            "untracked-item": area.id === "untracked",
-                          })}
-                          type="button"
-                          @click=${area.id !== "untracked"
-                            ? this._createAreaClickHandler(area)
-                            : undefined}
-                        >
-                          <span slot="headline">${area.name}</span>
-                          <span class="meta" slot="end"
-                            >${formatNumber(area.value, this.hass.locale, {
-                              maximumFractionDigits: 1,
-                            })}
-                            W</span
+                  ? (() => {
+                      const items: any[] = [];
+                      breakdown.floorGroups.forEach((floorGroup, groupIdx) => {
+                        // Add floor divider (not before the first group)
+                        if (groupIdx > 0) {
+                          items.push(html`<ha-md-divider
+                            class="floor-divider"
+                            role="separator"
+                            tabindex="-1"
+                          ></ha-md-divider>`);
+                        }
+
+                        // Add floor header item
+                        items.push(html`
+                          <ha-md-list-item
+                            class="floor-header"
+                            noninteractive
                           >
-                        </ha-md-list-item>
-                      `
-                    )
+                            <span slot="headline">${floorGroup.floor_name}</span>
+                          </ha-md-list-item>
+                        `);
+
+                        // Add areas in this floor group
+                        floorGroup.areas.forEach((area) => {
+                          items.push(html`
+                            <ha-md-list-item
+                              type="button"
+                              @click=${this._createAreaClickHandler(area)}
+                            >
+                              <span slot="headline">${area.name}</span>
+                              <span class="meta" slot="end"
+                                >${formatNumber(area.value, this.hass.locale, {
+                                  maximumFractionDigits: 1,
+                                })}
+                                W</span
+                              >
+                            </ha-md-list-item>
+                          `);
+                        });
+                      });
+
+                      // Add untracked item with divider if it exists
+                      if (breakdown.untracked) {
+                        items.push(html`<ha-md-divider
+                          role="separator"
+                          tabindex="-1"
+                        ></ha-md-divider>`);
+                        items.push(html`
+                          <ha-md-list-item
+                            class="untracked-item"
+                            noninteractive
+                          >
+                            <span slot="headline"
+                              >${breakdown.untracked.name}</span
+                            >
+                            <span class="meta" slot="end"
+                              >${formatNumber(
+                                breakdown.untracked.value,
+                                this.hass.locale,
+                                {
+                                  maximumFractionDigits: 1,
+                                }
+                              )}
+                              W</span
+                            >
+                          </ha-md-list-item>
+                        `);
+                      }
+
+                      return items;
+                    })()
                   : currentNavigation?.id
                     ? _computeEntityBreakdown(
                         this.hass,
@@ -718,6 +835,17 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
         .breakdown ha-md-list-item.untracked-item {
           pointer-events: none;
+        }
+
+        .breakdown ha-md-list-item.floor-header {
+          pointer-events: none;
+          --md-list-item-label-text-color: var(--secondary-text-color);
+          --md-list-item-supporting-text-color: var(--secondary-text-color);
+          font-weight: var(--ha-font-weight-medium);
+        }
+
+        .breakdown ha-md-divider.floor-divider {
+          opacity: 0.4;
         }
 
         .navigation-header {
