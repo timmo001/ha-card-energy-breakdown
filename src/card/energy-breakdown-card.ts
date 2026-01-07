@@ -625,7 +625,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                             <span slot="headline"
                               >${breakdown.untracked.name}</span
                             >
-                            <span class="meta" slot="end"
+                            <span class="meta untracked-total" slot="end"
                               >${formatNumber(
                                 breakdown.untracked.value,
                                 this.hass.locale,
@@ -858,6 +858,10 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         }
 
         .breakdown ha-md-list-item.floor-header .floor-total {
+          font-style: italic;
+        }
+
+        .breakdown ha-md-list-item.untracked-item .untracked-total {
           font-style: italic;
         }
 
