@@ -573,12 +573,22 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                         }
 
                         // Add floor header item
+                        const floorTotal = floorGroup.areas.reduce(
+                          (sum, area) => sum + area.value,
+                          0
+                        );
                         items.push(html`
                           <ha-md-list-item
                             class="floor-header"
                             noninteractive
                           >
                             <span slot="headline">${floorGroup.floor_name}</span>
+                            <span class="meta floor-total" slot="end"
+                              >${formatNumber(floorTotal, this.hass.locale, {
+                                maximumFractionDigits: 1,
+                              })}
+                              W</span
+                            >
                           </ha-md-list-item>
                         `);
 
@@ -845,6 +855,10 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           --md-list-item-label-text-color: var(--secondary-text-color);
           --md-list-item-supporting-text-color: var(--secondary-text-color);
           font-weight: var(--ha-font-weight-medium);
+        }
+
+        .breakdown ha-md-list-item.floor-header .floor-total {
+          font-style: italic;
         }
 
         .breakdown ha-md-divider.floor-divider {
