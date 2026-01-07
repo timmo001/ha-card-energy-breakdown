@@ -857,6 +857,11 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           font-weight: var(--ha-font-weight-medium);
         }
 
+        .breakdown ha-md-list-item.floor-header [slot="headline"],
+        .breakdown ha-md-list-item.untracked-item [slot="headline"] {
+          font-style: italic;
+        }
+
         .breakdown ha-md-list-item.floor-header .floor-total {
           font-style: italic;
         }
