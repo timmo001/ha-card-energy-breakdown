@@ -761,7 +761,6 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 4px;
         }
 
         .section-label {
