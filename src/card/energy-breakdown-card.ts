@@ -769,6 +769,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           color: var(--secondary-text-color);
           line-height: var(--ha-line-height-body-2);
           text-align: center;
+          font-style: italic;
         }
 
         .section-value {
