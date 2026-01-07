@@ -835,6 +835,9 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
         .breakdown ha-md-list-item.untracked-item {
           pointer-events: none;
+          --md-list-item-label-text-color: var(--secondary-text-color);
+          --md-list-item-supporting-text-color: var(--secondary-text-color);
+          font-weight: var(--ha-font-weight-medium);
         }
 
         .breakdown ha-md-list-item.floor-header {
