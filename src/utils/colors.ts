@@ -1,7 +1,7 @@
 import { rgb } from "culori";
 import { css } from "lit";
 
-export const COLORS = [
+const COLORS = [
   "primary",
   "accent",
   "red",
@@ -30,7 +30,7 @@ export const COLORS = [
   "disabled",
 ];
 
-export function computeRgbColor(color: string): string {
+function computeRgbColor(color: string): string {
   if (color === "primary" || color === "accent") {
     return `var(--rgb-${color}-color)`;
   }
@@ -51,7 +51,7 @@ export function computeRgbColor(color: string): string {
   return color;
 }
 
-export function computeColorName(color: string): string {
+function computeColorName(color: string): string {
   return color
     .split("-")
     .map((s) => capitalizeFirstLetter(s))

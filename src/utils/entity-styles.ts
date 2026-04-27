@@ -88,7 +88,7 @@ const strAnimations = {
     }`,
 };
 
-export const animation = {
+const animation = {
   pulse: css`
     ${unsafeCSS(strAnimations.pulse)}
   `,
