@@ -54,18 +54,18 @@ export type Selector =
   | UiStateContentSelector
   | BackupLocationSelector;
 
-export interface ActionSelector {
+interface ActionSelector {
   action: {} | null;
 }
 
-export interface AddonSelector {
+interface AddonSelector {
   addon: {
     name?: string;
     slug?: string;
   } | null;
 }
 
-export interface AreaSelector {
+interface AreaSelector {
   area: {
     entity?: EntitySelectorFilter | readonly EntitySelectorFilter[];
     device?: DeviceSelectorFilter | readonly DeviceSelectorFilter[];
@@ -73,22 +73,22 @@ export interface AreaSelector {
   } | null;
 }
 
-export interface AreasDisplaySelector {
+interface AreasDisplaySelector {
   areas_display: {} | null;
 }
 
-export interface AttributeSelector {
+interface AttributeSelector {
   attribute: {
     entity_id?: string;
     hide_attributes?: readonly string[];
   } | null;
 }
 
-export interface BooleanSelector {
+interface BooleanSelector {
   boolean: {} | null;
 }
 
-export interface ButtonToggleSelector {
+interface ButtonToggleSelector {
   button_toggle: {
     options: readonly string[] | readonly SelectOption[];
     translation_key?: string;
@@ -96,11 +96,11 @@ export interface ButtonToggleSelector {
   } | null;
 }
 
-export interface ColorRGBSelector {
+interface ColorRGBSelector {
   color_rgb: {} | null;
 }
 
-export interface ColorTempSelector {
+interface ColorTempSelector {
   color_temp: {
     unit?: "kelvin" | "mired";
     min?: number;
@@ -110,21 +110,21 @@ export interface ColorTempSelector {
   } | null;
 }
 
-export interface ConditionSelector {
+interface ConditionSelector {
   condition: {} | null;
 }
 
-export interface ConversationAgentSelector {
+interface ConversationAgentSelector {
   conversation_agent: { language?: string } | null;
 }
 
-export interface ConfigEntrySelector {
+interface ConfigEntrySelector {
   config_entry: {
     integration?: string;
   } | null;
 }
 
-export interface ConstantSelector {
+interface ConstantSelector {
   constant: {
     value: string | number | boolean;
     label?: string;
@@ -132,18 +132,18 @@ export interface ConstantSelector {
   } | null;
 }
 
-export interface CountrySelector {
+interface CountrySelector {
   country: {
     countries: string[];
     no_sort?: boolean;
   } | null;
 }
 
-export interface DateSelector {
+interface DateSelector {
   date: {} | null;
 }
 
-export interface DateTimeSelector {
+interface DateTimeSelector {
   datetime: {} | null;
 }
 
@@ -154,7 +154,7 @@ interface DeviceSelectorFilter {
   model_id?: string;
 }
 
-export interface DeviceSelector {
+interface DeviceSelector {
   device: {
     filter?: DeviceSelectorFilter | readonly DeviceSelectorFilter[];
     entity?: EntitySelectorFilter | readonly EntitySelectorFilter[];
@@ -162,7 +162,7 @@ export interface DeviceSelector {
   } | null;
 }
 
-export interface FloorSelector {
+interface FloorSelector {
   floor: {
     entity?: EntitySelectorFilter | readonly EntitySelectorFilter[];
     device?: DeviceSelectorFilter | readonly DeviceSelectorFilter[];
@@ -170,7 +170,7 @@ export interface FloorSelector {
   } | null;
 }
 
-export interface LegacyDeviceSelector {
+interface LegacyDeviceSelector {
   device: DeviceSelector["device"] & {
     /**
      * @deprecated Use filter instead
@@ -187,7 +187,7 @@ export interface LegacyDeviceSelector {
   };
 }
 
-export interface DurationSelector {
+interface DurationSelector {
   duration: {
     enable_day?: boolean;
     enable_millisecond?: boolean;
@@ -201,7 +201,7 @@ interface EntitySelectorFilter {
   supported_features?: number | [number];
 }
 
-export interface EntitySelector {
+interface EntitySelector {
   entity: {
     multiple?: boolean;
     include_entities?: string[];
@@ -210,7 +210,7 @@ export interface EntitySelector {
   } | null;
 }
 
-export interface LegacyEntitySelector {
+interface LegacyEntitySelector {
   entity: EntitySelector["entity"] & {
     /**
      * @deprecated Use filter instead
@@ -227,48 +227,48 @@ export interface LegacyEntitySelector {
   };
 }
 
-export interface StatisticSelector {
+interface StatisticSelector {
   statistic: {
     device_class?: string;
     multiple?: boolean;
   };
 }
 
-export interface FileSelector {
+interface FileSelector {
   file: {
     accept: string;
   } | null;
 }
 
-export interface IconSelector {
+interface IconSelector {
   icon: {
     placeholder?: string;
     fallbackPath?: string;
   } | null;
 }
 
-export interface CropOptions {
+interface CropOptions {
   round: boolean;
   type?: "image/jpeg" | "image/png";
   quality?: number;
   aspectRatio?: number;
 }
 
-export interface ImageSelector {
+interface ImageSelector {
   image: { original?: boolean; crop?: CropOptions } | null;
 }
 
-export interface BackgroundSelector {
+interface BackgroundSelector {
   background: { original?: boolean; crop?: CropOptions } | null;
 }
 
-export interface LabelSelector {
+interface LabelSelector {
   label: {
     multiple?: boolean;
   };
 }
 
-export interface LanguageSelector {
+interface LanguageSelector {
   language: {
     languages?: string[];
     native_name?: boolean;
@@ -276,7 +276,7 @@ export interface LanguageSelector {
   } | null;
 }
 
-export interface LocationSelector {
+interface LocationSelector {
   location: {
     radius?: boolean;
     radius_readonly?: boolean;
@@ -284,17 +284,17 @@ export interface LocationSelector {
   } | null;
 }
 
-export interface LocationSelectorValue {
+interface LocationSelectorValue {
   latitude: number;
   longitude: number;
   radius?: number;
 }
 
-export interface MediaSelector {
+interface MediaSelector {
   media: {} | null;
 }
 
-export interface MediaSelectorValue {
+interface MediaSelectorValue {
   entity_id?: string;
   media_content_id?: string;
   media_content_type?: string;
@@ -307,11 +307,11 @@ export interface MediaSelectorValue {
   };
 }
 
-export interface NavigationSelector {
+interface NavigationSelector {
   navigation: {} | null;
 }
 
-export interface NumberSelector {
+interface NumberSelector {
   number: {
     min?: number;
     max?: number;
@@ -322,11 +322,11 @@ export interface NumberSelector {
   } | null;
 }
 
-export interface ObjectSelector {
+interface ObjectSelector {
   object: {} | null;
 }
 
-export interface AssistPipelineSelector {
+interface AssistPipelineSelector {
   assist_pipeline: {
     include_last_used?: boolean;
   } | null;
@@ -338,7 +338,7 @@ interface SelectBoxOptionImage {
   flip_rtl?: boolean;
 }
 
-export interface SelectOption {
+interface SelectOption {
   value: any;
   label: string;
   description?: string;
@@ -346,7 +346,7 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
-export interface SelectSelector {
+interface SelectSelector {
   select: {
     multiple?: boolean;
     custom_value?: boolean;
@@ -359,11 +359,11 @@ export interface SelectSelector {
   } | null;
 }
 
-export interface SelectorSelector {
+interface SelectorSelector {
   selector: {} | null;
 }
 
-export interface StateSelector {
+interface StateSelector {
   state: {
     extra_options?: { label: string; value: any }[];
     entity_id?: string;
@@ -371,11 +371,11 @@ export interface StateSelector {
   } | null;
 }
 
-export interface BackupLocationSelector {
+interface BackupLocationSelector {
   backup_location: {} | null;
 }
 
-export interface QRCodeSelector {
+interface QRCodeSelector {
   qr_code: {
     data: string;
     scale?: number;
@@ -384,7 +384,7 @@ export interface QRCodeSelector {
   } | null;
 }
 
-export interface StringSelector {
+interface StringSelector {
   text: {
     multiline?: boolean;
     type?:
@@ -408,50 +408,50 @@ export interface StringSelector {
   } | null;
 }
 
-export interface STTSelector {
+interface STTSelector {
   stt: { language?: string } | null;
 }
 
-export interface TargetSelector {
+interface TargetSelector {
   target: {
     entity?: EntitySelectorFilter | readonly EntitySelectorFilter[];
     device?: DeviceSelectorFilter | readonly DeviceSelectorFilter[];
   } | null;
 }
 
-export interface TemplateSelector {
+interface TemplateSelector {
   template: {} | null;
 }
 
-export interface ThemeSelector {
+interface ThemeSelector {
   theme: { include_default?: boolean } | null;
 }
-export interface TimeSelector {
+interface TimeSelector {
   time: { no_second?: boolean } | null;
 }
 
-export interface TriggerSelector {
+interface TriggerSelector {
   trigger: {} | null;
 }
 
-export interface TTSSelector {
+interface TTSSelector {
   tts: { language?: string } | null;
 }
 
-export interface TTSVoiceSelector {
+interface TTSVoiceSelector {
   tts_voice: { engineId?: string; language?: string } | null;
 }
 
-export type UiAction = Exclude<ActionConfig["action"], "fire-dom-event">;
+type UiAction = Exclude<ActionConfig["action"], "fire-dom-event">;
 
-export interface UiActionSelector {
+interface UiActionSelector {
   ui_action: {
     actions?: UiAction[];
     default_action?: UiAction;
   } | null;
 }
 
-export interface UiColorSelector {
+interface UiColorSelector {
   ui_color: {
     default_color?: string;
     include_none?: boolean;
@@ -459,7 +459,7 @@ export interface UiColorSelector {
   } | null;
 }
 
-export interface UiStateContentSelector {
+interface UiStateContentSelector {
   ui_state_content: {
     entity_id?: string;
     allow_name?: boolean;

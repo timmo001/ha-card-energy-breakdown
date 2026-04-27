@@ -6,7 +6,7 @@ import { getEntityContext } from "./context/get_entity_context";
 
 type EntityCategory = "none" | "config" | "diagnostic";
 
-export interface EntityFilter {
+interface EntityFilter {
   domain?: string | string[];
   device_class?: string | string[];
   device?: string | string[];
@@ -17,7 +17,7 @@ export interface EntityFilter {
   hidden_platform?: string | string[];
 }
 
-export type EntityFilterFunc = (entityId: string) => boolean;
+type EntityFilterFunc = (entityId: string) => boolean;
 
 export const generateEntityFilter = (
   hass: HomeAssistant,

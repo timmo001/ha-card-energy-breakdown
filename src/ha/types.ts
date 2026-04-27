@@ -98,7 +98,7 @@ export interface FloorRegistryEntry {
   icon?: string;
 }
 
-export interface ThemeSettings {
+interface ThemeSettings {
   theme: string;
   // Radio box selection for theme picker. Do not use in Lovelace rendering as
   // it can be undefined == auto.
@@ -108,7 +108,7 @@ export interface ThemeSettings {
   accentColor?: string;
 }
 
-export interface PanelInfo<T = Record<string, any> | null> {
+interface PanelInfo<T = Record<string, any> | null> {
   component_name: string;
   config: T;
   icon: string | null;
@@ -116,39 +116,39 @@ export interface PanelInfo<T = Record<string, any> | null> {
   url_path: string;
 }
 
-export interface Panels {
+interface Panels {
   [name: string]: PanelInfo;
 }
 
-export interface Resources {
+interface Resources {
   [language: string]: Record<string, string>;
 }
 
-export interface Translation {
+interface Translation {
   nativeName: string;
   isRTL: boolean;
   hash: string;
 }
 
-export interface TranslationMetadata {
+interface TranslationMetadata {
   fragments: string[];
   translations: {
     [lang: string]: Translation;
   };
 }
 
-export interface Credential {
+interface Credential {
   auth_provider_type: string;
   auth_provider_id: string;
 }
 
-export interface MFAModule {
+interface MFAModule {
   id: string;
   name: string;
   enabled: boolean;
 }
 
-export interface CurrentUser {
+interface CurrentUser {
   id: string;
   is_owner: boolean;
   is_admin: boolean;
@@ -157,20 +157,20 @@ export interface CurrentUser {
   mfa_modules: MFAModule[];
 }
 
-export interface ServiceCallRequest {
+interface ServiceCallRequest {
   domain: string;
   service: string;
   serviceData?: Record<string, any>;
   target?: HassServiceTarget;
 }
 
-export interface Context {
+interface Context {
   id: string;
   parent_id?: string;
   user_id?: string | null;
 }
 
-export interface ServiceCallResponse {
+interface ServiceCallResponse {
   context: Context;
 }
 
@@ -239,7 +239,6 @@ export interface HomeAssistant {
   formatEntityAttributeName(stateObj: HassEntity, attribute: string): string;
 }
 
-export type Constructor<T = any> = new (...args: any[]) => T;
 
 // Lovelace interfaces needed by the card
 export interface LovelaceCardConfig {
@@ -256,17 +255,7 @@ export interface LovelaceCardEditor extends HTMLElement {
   hass?: HomeAssistant;
 }
 
-export interface LovelaceGridOptions {
-  columns: number;
-  rows: number;
-  min_rows?: number;
-  min_columns?: number;
-}
 
-export interface LovelaceLayoutOptions {
-  grid_columns: number;
-  grid_rows: number;
-}
 
 // Additional Lovelace types
 export interface ActionConfig {
@@ -274,33 +263,8 @@ export interface ActionConfig {
   [key: string]: any;
 }
 
-export interface LovelaceConfig {
-  views: Array<Record<string, any>>;
-  [key: string]: any;
-}
 
-export interface LovelaceBadgeConfig {
-  type: string;
-  [key: string]: any;
-}
 
-export interface LovelaceCardFeatureConfig {
-  type: string;
-  [key: string]: any;
-}
 
-export interface LovelaceViewConfig {
-  title?: string;
-  [key: string]: any;
-}
 
-export interface ShowViewConfig {
-  [key: string]: any;
-}
 
-export interface Condition {
-  condition: string;
-  entity?: string;
-  state?: string;
-  [key: string]: any;
-}

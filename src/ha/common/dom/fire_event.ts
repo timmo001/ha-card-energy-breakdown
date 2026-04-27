@@ -33,9 +33,9 @@ declare global {
   interface HASSDomEvents {}
 }
 
-export type ValidHassDomEvent = keyof HASSDomEvents;
+type ValidHassDomEvent = keyof HASSDomEvents;
 
-export interface HASSDomEvent<T> extends Event {
+interface HASSDomEvent<T> extends Event {
   detail: T;
 }
 
