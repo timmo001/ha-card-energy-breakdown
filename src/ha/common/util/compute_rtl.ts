@@ -9,20 +9,20 @@ export function computeRTL(hass: HomeAssistant) {
   return false;
 }
 
-export function computeRTLDirection(hass: HomeAssistant) {
+function computeRTLDirection(hass: HomeAssistant) {
   return emitRTLDirection(computeRTL(hass));
 }
 
-export function emitRTLDirection(rtl: boolean) {
+function emitRTLDirection(rtl: boolean) {
   return rtl ? "rtl" : "ltr";
 }
 
-export function computeDirectionStyles(isRTL: boolean, element: LitElement) {
+function computeDirectionStyles(isRTL: boolean, element: LitElement) {
   const direction: string = emitRTLDirection(isRTL);
   setDirectionStyles(direction, element);
 }
 
-export function setDirectionStyles(direction: string, element: LitElement) {
+function setDirectionStyles(direction: string, element: LitElement) {
   element.style.direction = direction;
   element.style.setProperty("--direction", direction);
   element.style.setProperty(

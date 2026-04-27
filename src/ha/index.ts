@@ -7,13 +7,8 @@ export { generateEntityFilter } from "./common/entity/generate_entity_filter";
 export { deepEqual } from "./common/util/deep-equal";
 export { handleStructError } from "./common/structs/handle-errors";
 export { haStyleScrollbar } from "./resources/styles";
-export { actionConfigStruct } from "./panels/lovelace/editor/structs/action-struct";
 export { configElementStyle } from "./panels/lovelace/editor/config-elements/config-elements-style";
 export {
-  isActive,
-  isAvailable,
-  isUnknown,
-  getEntityPicture,
   isNumericState,
   isUnavailableState,
 } from "./data/entity";
@@ -22,8 +17,6 @@ export type {
   LovelaceCard,
   LovelaceCardEditor,
   LovelaceCardConfig,
-  LovelaceGridOptions,
-  LovelaceLayoutOptions,
   ActionConfig,
   LovelaceConfig,
   LovelaceBadgeConfig,

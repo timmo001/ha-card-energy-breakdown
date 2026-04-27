@@ -19,30 +19,21 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@material/mwc-select": "^0.27.0",
-    "@material/mwc-textfield": "^0.27.0",
-    "color": "^4.2.3",
-    "culori": "^4.0.2",
-    "hammerjs": "^2.0.8",
-    "home-assistant-js-websocket": "^9.6.0",
-    "intl-messageformat": "^10.7.16",
-    "js-yaml": "^4.1.1",
+    "superstruct": "^2.0.2",
     "lit": "^3.3.1",
+    "js-yaml": "^4.1.1",
+    "culori": "^4.0.2",
     "memoize-one": "^6.0.0",
-    "object-hash": "^3.0.0",
-    "sortablejs": "^1.15.6",
-    "superstruct": "^2.0.2"
+    "home-assistant-js-websocket": "^9.6.0"
   },
   "devDependencies": {
-    "@material/mwc-ripple": "^0.27.0",
-    "@material/tab-bar": "^14.0.0",
+    "typescript": "^5.9.2",
+    "rollup-plugin-serve": "^1.1.1",
     "@types/color": "^4.2.0",
     "@types/hammerjs": "^2.0.46",
     "eslint": "^9.35.0",
     "prettier": "^3.6.2",
-    "rolldown": "^1.0.0-rc.11",
-    "rollup-plugin-serve": "^1.1.1",
-    "typescript": "^5.9.2"
+    "rolldown": "^1.0.0-rc.11"
   },
   "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a"
 }

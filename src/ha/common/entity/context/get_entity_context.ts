@@ -36,7 +36,7 @@ export const getEntityContext = (
   return getEntityEntryContext(entry, entities, devices, areas, floors);
 };
 
-export const getEntityEntryContext = (
+const getEntityEntryContext = (
   entry: EntityRegistryDisplayEntry,
   entities: HomeAssistant["entities"],
   devices: HomeAssistant["devices"],

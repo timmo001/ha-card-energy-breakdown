@@ -1,13 +1,13 @@
 import { HassEntity } from "home-assistant-js-websocket";
 import { computeDomain } from "../common/entity/compute_domain";
 
-export const UNAVAILABLE = "unavailable";
-export const UNKNOWN = "unknown";
-export const ON = "on";
-export const OFF = "off";
+const UNAVAILABLE = "unavailable";
+const UNKNOWN = "unknown";
+const ON = "on";
+const OFF = "off";
 
-export const UNAVAILABLE_STATES = [UNAVAILABLE, UNKNOWN] as const;
-export const OFF_STATES = [UNAVAILABLE, UNKNOWN, OFF] as const;
+const UNAVAILABLE_STATES = [UNAVAILABLE, UNKNOWN] as const;
+const OFF_STATES = [UNAVAILABLE, UNKNOWN, OFF] as const;
 
 // Helper function for literal includes without external dependency
 const arrayLiteralIncludes =
@@ -16,9 +16,9 @@ const arrayLiteralIncludes =
     array.includes(value as T[number]);
 
 export const isUnavailableState = arrayLiteralIncludes(UNAVAILABLE_STATES);
-export const isOffState = arrayLiteralIncludes(OFF_STATES);
+const isOffState = arrayLiteralIncludes(OFF_STATES);
 
-export function isActive(stateObj: HassEntity) {
+function isActive(stateObj: HassEntity) {
   const domain = computeDomain(stateObj.entity_id);
   const state = stateObj.state;
 
@@ -49,19 +49,19 @@ export function isActive(stateObj: HassEntity) {
   }
 }
 
-export function isAvailable(stateObj: HassEntity) {
+function isAvailable(stateObj: HassEntity) {
   return stateObj.state !== UNAVAILABLE;
 }
 
-export function isOff(stateObj: HassEntity) {
+function isOff(stateObj: HassEntity) {
   return stateObj.state === OFF;
 }
 
-export function isUnknown(stateObj: HassEntity) {
+function isUnknown(stateObj: HassEntity) {
   return stateObj.state === UNKNOWN;
 }
 
-export function getEntityPicture(stateObj: HassEntity) {
+function getEntityPicture(stateObj: HassEntity) {
   return (
     (stateObj.attributes.entity_picture_local as string | undefined) ||
     stateObj.attributes.entity_picture

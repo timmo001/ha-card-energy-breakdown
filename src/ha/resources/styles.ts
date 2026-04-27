@@ -1,6 +1,6 @@
 import { css } from "lit";
 
-export const buttonLinkStyle = css`
+const buttonLinkStyle = css`
   button.link {
     background: none;
     color: inherit;
@@ -14,7 +14,7 @@ export const buttonLinkStyle = css`
   }
 `;
 
-export const haStyle = css`
+const haStyle = css`
   :host {
     font-family: var(--ha-font-family-body);
     -webkit-font-smoothing: var(--ha-font-smoothing);
@@ -135,7 +135,7 @@ export const haStyle = css`
   }
 `;
 
-export const haStyleDialog = css`
+const haStyleDialog = css`
   /* mwc-dialog (ha-dialog) styles */
   ha-dialog {
     --mdc-dialog-min-width: 400px;
@@ -187,7 +187,7 @@ export const haStyleScrollbar = css`
   }
 `;
 
-export const baseEntrypointStyles = css`
+const baseEntrypointStyles = css`
   body {
     background-color: var(--primary-background-color);
     color: var(--primary-text-color);

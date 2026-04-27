@@ -11,7 +11,7 @@ import {
 } from "./energy-breakdown-card-config";
 
 @customElement(CARD_EDITOR_NAME)
-export class EnergyBreakdownCardEditor extends LitElement {
+class EnergyBreakdownCardEditor extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
 
   @state() private _config?: EnergyBreakdownCardConfig;

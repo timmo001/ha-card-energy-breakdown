@@ -10,14 +10,14 @@ import { round } from "./round";
  * Returns true if the entity is considered numeric based on the attributes it has
  * @param stateObj The entity state object
  */
-export const isNumericState = (stateObj: HassEntity): boolean =>
+const isNumericState = (stateObj: HassEntity): boolean =>
   isNumericFromAttributes(stateObj.attributes);
 
-export const isNumericFromAttributes = (
+const isNumericFromAttributes = (
   attributes: HassEntityAttributeBase
 ): boolean => !!attributes.unit_of_measurement || !!attributes.state_class;
 
-export const numberFormatToLocale = (
+const numberFormatToLocale = (
   localeOptions: FrontendLocaleData
 ): string | string[] | undefined => {
   switch (localeOptions.number_format) {
@@ -90,7 +90,7 @@ export const formatNumber = (
  * @param entityState The state object of the entity
  * @returns An `Intl.NumberFormatOptions` object with `maximumFractionDigits` set to 0, or `undefined`
  */
-export const getNumberFormatOptions = (
+const getNumberFormatOptions = (
   entityState: HassEntity,
   entity?: EntityRegistryDisplayEntry
 ): Intl.NumberFormatOptions | undefined => {
@@ -122,7 +122,7 @@ export const getNumberFormatOptions = (
  * @param num The number to be formatted
  * @param options The Intl.NumberFormatOptions that should be included in the returned options
  */
-export const getDefaultFormatOptions = (
+const getDefaultFormatOptions = (
   num: string | number,
   options?: Intl.NumberFormatOptions
 ): Intl.NumberFormatOptions => {
