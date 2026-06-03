@@ -60,6 +60,23 @@ registerCustomCard({
   type: CARD_NAME,
   name: CARD_NAME_FRIENDLY,
   description: CARD_DESCRIPTION,
+  getEntitySuggestion: (hass, entityId) => {
+    if (
+      !generateEntityFilter(hass, {
+        domain: "sensor",
+        device_class: "power",
+      })(entityId)
+    ) {
+      return null;
+    }
+
+    return {
+      config: {
+        type: `custom:${CARD_NAME}`,
+        power_entity: entityId,
+      },
+    };
+  },
 });
 
 @customElement(CARD_NAME)
