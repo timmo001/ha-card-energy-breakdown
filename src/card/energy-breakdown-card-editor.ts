@@ -1,6 +1,5 @@
 import { html, LitElement, nothing, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import memoizeOne from "memoize-one";
 import { assert } from "superstruct";
 import { configElementStyle, HomeAssistant } from "../ha";
 import { CARD_EDITOR_NAME, CARD_NAME } from "./const";
@@ -16,135 +15,132 @@ class EnergyBreakdownCardEditor extends LitElement {
 
   @state() private _config?: EnergyBreakdownCardConfig;
 
-  private _schema = memoizeOne(
-    (config: EnergyBreakdownCardConfig) =>
-      [
-        {
-          name: "power_entity",
-          selector: {
-            entity: {
-              filter: [{ domain: "sensor", device_class: "power" }],
-            },
-          },
+  private readonly _schema = [
+    {
+      name: "power_entity",
+      selector: {
+        entity: {
+          filter: [{ domain: "sensor", device_class: "power" }],
         },
-        {
-          name: "hide_background",
-          selector: {
-            boolean: {},
-          },
-        },
+      },
+    },
+    {
+      name: "hide_background",
+      selector: {
+        boolean: {},
+      },
+    },
 
+    {
+      name: "visibility",
+      flatten: true,
+      type: "expandable",
+      icon: "mdi:view-headline",
+      expanded: true,
+      schema: [
         {
-          name: "visibility",
-          flatten: true,
-          type: "expandable",
-          icon: "mdi:view-headline",
-          expanded: true,
+          name: "",
+          type: "grid",
           schema: [
             {
-              name: "",
-              type: "grid",
-              schema: [
-                {
-                  name: "header_current_show",
-                  selector: {
-                    boolean: {},
-                  },
-                },
-                {
-                  name: "header_day_show",
-                  selector: {
-                    boolean: {},
-                  },
-                },
-              ],
+              name: "header_current_show",
+              selector: {
+                boolean: {},
+              },
             },
             {
-              name: "",
-              type: "grid",
-              schema: [
-                {
-                  name: "header_current_icon",
-                  disabled: !config.header_current_show,
-                  selector: {
-                    icon: {},
-                  },
-                },
-                {
-                  name: "header_day_icon",
-                  disabled: !config.header_day_show,
-                  selector: {
-                    icon: {},
-                  },
-                },
-              ],
-            },
-            {
-              name: "",
-              type: "grid",
-              schema: [
-                {
-                  name: "header_current_title_hide",
-                  disabled: !config.header_current_show,
-                  selector: {
-                    boolean: {},
-                  },
-                },
-                {
-                  name: "header_day_title_hide",
-                  disabled: !config.header_day_show,
-                  selector: {
-                    boolean: {},
-                  },
-                },
-              ],
+              name: "header_day_show",
+              selector: {
+                boolean: {},
+              },
             },
           ],
         },
         {
-          name: "breakdown_show",
+          name: "",
+          type: "grid",
+          schema: [
+            {
+              name: "header_current_icon",
+              hidden: { field: "header_current_show", value: false },
+              selector: {
+                icon: {},
+              },
+            },
+            {
+              name: "header_day_icon",
+              hidden: { field: "header_day_show", value: false },
+              selector: {
+                icon: {},
+              },
+            },
+          ],
+        },
+        {
+          name: "",
+          type: "grid",
+          schema: [
+            {
+              name: "header_current_title_hide",
+              hidden: { field: "header_current_show", value: false },
+              selector: {
+                boolean: {},
+              },
+            },
+            {
+              name: "header_day_title_hide",
+              hidden: { field: "header_day_show", value: false },
+              selector: {
+                boolean: {},
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "breakdown_show",
+      selector: {
+        boolean: {},
+      },
+    },
+    {
+      name: "breakdown",
+      flatten: true,
+      type: "expandable",
+      icon: "mdi:format-list-bulleted",
+      expanded: true,
+      hidden: { field: "breakdown_show", value: false },
+      schema: [
+        {
+          name: "breakdown_show_untracked",
           selector: {
             boolean: {},
           },
         },
         {
-          name: "breakdown",
-          flatten: true,
-          type: "expandable",
-          icon: "mdi:format-list-bulleted",
-          expanded: true,
-          disabled: !config.breakdown_show,
-          schema: [
-            {
-              name: "breakdown_show_untracked",
-              selector: {
-                boolean: {},
-              },
-            },
-            {
-              name: "breakdown_show_zero_values",
-              selector: {
-                boolean: {},
-              },
-            },
-            {
-              name: "breakdown_sort",
-              selector: {
-                select: {
-                  mode: "dropdown",
-                  options: [
-                    { value: "name-asc", label: "Name (A-Z)" },
-                    { value: "name-desc", label: "Name (Z-A)" },
-                    { value: "value-asc", label: "Value (Low to High)" },
-                    { value: "value-desc", label: "Value (High to Low)" },
-                  ],
-                },
-              },
-            },
-          ],
+          name: "breakdown_show_zero_values",
+          selector: {
+            boolean: {},
+          },
         },
-      ] as const satisfies readonly HaFormSchema[]
-  );
+        {
+          name: "breakdown_sort",
+          selector: {
+            select: {
+              mode: "dropdown",
+              options: [
+                { value: "name-asc", label: "Name (A-Z)" },
+                { value: "name-desc", label: "Name (Z-A)" },
+                { value: "value-asc", label: "Value (Low to High)" },
+                { value: "value-desc", label: "Value (High to Low)" },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ] as const satisfies readonly HaFormSchema[];
 
   public setConfig(config: EnergyBreakdownCardConfig): void {
     assert(config, energyBreakdownCardConfigStruct);
@@ -175,13 +171,11 @@ class EnergyBreakdownCardEditor extends LitElement {
       return nothing;
     }
 
-    const schema = this._schema(this._config);
-
     return html`
       <ha-form
         .hass=${this.hass}
         .data=${this._config}
-        .schema=${schema}
+        .schema=${this._schema}
         .computeLabel=${this._computeLabelCallback}
         .computeHelper=${this._computeHelperCallback}
         @value-changed=${this._valueChanged}
