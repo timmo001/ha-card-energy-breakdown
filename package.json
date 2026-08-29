@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "typescript": "^5.9.2",
-    "rollup-plugin-serve": "^1.1.1",
+    "rollup-plugin-serve": "^3.0.0",
     "@types/color": "^4.2.0",
     "@types/hammerjs": "^2.0.46",
     "eslint": "^9.35.0",
