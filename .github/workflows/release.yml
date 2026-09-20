@@ -13,6 +13,6 @@ permissions:
 
 jobs:
   release:
-    uses: timmo001/workflows/.github/workflows/ha-card-release.yml@master
+    uses: timmo001/workflows/.github/workflows/ha-card-release.yml@2b050288cd02492c371a6ef5269817db163c002b # master
     permissions:
       contents: write
