@@ -28,6 +28,7 @@ interface HaFormBaseSchema {
   default?: HaFormData;
   required?: boolean;
   disabled?: boolean;
+  hidden?: boolean | HaFormCondition | HaFormCondition[];
   description?: {
     suffix?: string;
     // This value will be set initially when form is loaded
@@ -35,6 +36,41 @@ interface HaFormBaseSchema {
   };
   context?: Record<string, string>;
 }
+
+type HaFormConditionOperator =
+  | "eq"
+  | "not_eq"
+  | "in"
+  | "not_in"
+  | "exists"
+  | "not_exists";
+
+interface HaFormFieldCondition {
+  field: string;
+  operator?: HaFormConditionOperator;
+  value?: HaFormData | readonly HaFormData[];
+}
+
+interface HaFormAndCondition {
+  condition: "and";
+  conditions: readonly HaFormCondition[];
+}
+
+interface HaFormOrCondition {
+  condition: "or";
+  conditions: readonly HaFormCondition[];
+}
+
+interface HaFormNotCondition {
+  condition: "not";
+  conditions: readonly HaFormCondition[];
+}
+
+type HaFormCondition =
+  | HaFormFieldCondition
+  | HaFormAndCondition
+  | HaFormOrCondition
+  | HaFormNotCondition;
 
 interface HaFormGridSchema extends HaFormBaseSchema {
   type: "grid";
