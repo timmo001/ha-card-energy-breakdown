@@ -383,7 +383,8 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         const floorsWithoutLevel: FloorGroup[] = [];
 
         floorGroupsMap.forEach((areas, floorId) => {
-          const floor = floorId && hass.floors ? hass.floors[floorId] : undefined;
+          const floor =
+            floorId && hass.floors ? hass.floors[floorId] : undefined;
           if (floor) {
             const floorGroup: FloorGroup = {
               floor_id: floorId,
@@ -486,205 +487,252 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         "hide-background": this._config?.hide_background === true,
       })}
     >
-      ${this._config?.header_current_show || this._config?.header_day_show
-        ? html`
-            <div
-              class=${classMap({
-                heading: true,
-                "reduced-padding": gridRows < 3,
-                "with-day-total": this._config?.header_day_show,
-                "breakdown-hidden": this._config?.breakdown_show === false,
-              })}
-            >
-              ${this._config?.header_current_show
-                ? html`
-                    <div
-                      class="power-section"
-                      @click=${this._handleCurrentClick}
-                    >
-                      <div class="section-value">
-                        <ha-icon
-                          class="icon"
-                          .icon=${powerEntityIcon}
-                        ></ha-icon>
-                        <span class="value"
-                          >${currentStateObj
-                            ? isUnavailableState(currentStateObj.state)
-                              ? "N/A"
-                              : formatNumber(
-                                  currentStateObj.state,
-                                  this.hass.locale,
-                                  {
-                                    maximumFractionDigits: 1,
-                                  }
-                                )
-                            : "--.-"}</span
+      ${
+        this._config?.header_current_show || this._config?.header_day_show
+          ? html`
+              <div
+                class=${classMap({
+                  heading: true,
+                  "reduced-padding": gridRows < 3,
+                  "with-day-total": this._config?.header_day_show,
+                  "breakdown-hidden": this._config?.breakdown_show === false,
+                })}
+              >
+                ${
+                  this._config?.header_current_show
+                    ? html`
+                        <div
+                          class="power-section"
+                          @click=${this._handleCurrentClick}
                         >
-                        <span class="measurement"
-                          >${currentStateObj &&
-                          !isUnavailableState(currentStateObj.state)
-                            ? uom
-                            : "W"}</span
+                          <div class="section-value">
+                            <ha-icon
+                              class="icon"
+                              .icon=${powerEntityIcon}
+                            ></ha-icon>
+                            <span class="value"
+                              >${
+                                currentStateObj
+                                  ? isUnavailableState(currentStateObj.state)
+                                    ? "N/A"
+                                    : formatNumber(
+                                        currentStateObj.state,
+                                        this.hass.locale,
+                                        {
+                                          maximumFractionDigits: 1,
+                                        }
+                                      )
+                                  : "--.-"
+                              }</span
+                            >
+                            <span class="measurement"
+                              >${
+                                currentStateObj &&
+                                !isUnavailableState(currentStateObj.state)
+                                  ? uom
+                                  : "W"
+                              }</span
+                            >
+                          </div>
+                          ${
+                            !this._config?.header_current_title_hide &&
+                            gridRows > 1
+                              ? html`<div class="section-label">Current</div>`
+                              : nothing
+                          }
+                        </div>
+                      `
+                    : nothing
+                }
+                ${
+                  this._config?.header_day_show
+                    ? html`
+                        <div
+                          class="day-total-section"
+                          @click=${this._handleDayTotalClick}
                         >
-                      </div>
-                      ${!this._config?.header_current_title_hide && gridRows > 1
-                        ? html`<div class="section-label">Current</div>`
-                        : nothing}
-                    </div>
-                  `
-                : nothing}
-              ${this._config?.header_day_show
-                ? html`
-                    <div
-                      class="day-total-section"
-                      @click=${this._handleDayTotalClick}
-                    >
-                      <div class="section-value">
-                        <ha-icon class="icon" .icon=${todayIcon}></ha-icon>
-                        <span class="value"
-                          >${this._dayTotal !== null
-                            ? formatNumber(this._dayTotal, this.hass.locale, {
-                                maximumFractionDigits: 1,
-                              })
-                            : "--.-"}</span
-                        >
-                        <span class="measurement">kWh</span>
-                      </div>
-                      ${!this._config?.header_day_title_hide && gridRows > 1
-                        ? html`<div class="section-label">Today</div>`
-                        : nothing}
-                    </div>
-                  `
-                : nothing}
-            </div>
-          `
-        : nothing}
-      ${this._config?.breakdown_show && gridRows > 1
-        ? html`
-            <div class="breakdown ha-scrollbar">
-              ${showBackButton
-                ? html`
-                    <div class="navigation-header">
-                      <ha-icon-button-arrow-prev
-                        @click=${this._goBack}
-                        .hass=${this.hass}
-                      ></ha-icon-button-arrow-prev>
-                      <span class="navigation-title"
-                        >${currentNavigation?.name}</span
-                      >
-                    </div>
-                  `
-                : nothing}
-              <ha-md-list>
-                ${this._currentView === "areas"
-                  ? (() => {
-                      const items: any[] = [];
-                      breakdown.floorGroups.forEach((floorGroup, groupIdx) => {
-                        // Add floor divider (not before the first group)
-                        if (groupIdx > 0) {
-                          items.push(html`<ha-md-divider
-                            class="floor-divider"
-                            role="separator"
-                            tabindex="-1"
-                          ></ha-md-divider>`);
-                        }
-
-                        // Add floor header item
-                        const floorTotal = floorGroup.areas.reduce(
-                          (sum, area) => sum + area.value,
-                          0
-                        );
-                        items.push(html`
-                          <ha-md-list-item
-                            class="floor-header"
-                            noninteractive
+                          <div class="section-value">
+                            <ha-icon class="icon" .icon=${todayIcon}></ha-icon>
+                            <span class="value"
+                              >${
+                                this._dayTotal !== null
+                                  ? formatNumber(
+                                      this._dayTotal,
+                                      this.hass.locale,
+                                      {
+                                        maximumFractionDigits: 1,
+                                      }
+                                    )
+                                  : "--.-"
+                              }</span
+                            >
+                            <span class="measurement">kWh</span>
+                          </div>
+                          ${
+                            !this._config?.header_day_title_hide && gridRows > 1
+                              ? html`<div class="section-label">Today</div>`
+                              : nothing
+                          }
+                        </div>
+                      `
+                    : nothing
+                }
+              </div>
+            `
+          : nothing
+      }
+      ${
+        this._config?.breakdown_show && gridRows > 1
+          ? html`
+              <div class="breakdown ha-scrollbar">
+                ${
+                  showBackButton
+                    ? html`
+                        <div class="navigation-header">
+                          <ha-icon-button-arrow-prev
+                            @click=${this._goBack}
+                            .hass=${this.hass}
+                          ></ha-icon-button-arrow-prev>
+                          <span class="navigation-title"
+                            >${currentNavigation?.name}</span
                           >
-                            <span slot="headline">${floorGroup.floor_name}</span>
-                            <span class="meta floor-total" slot="end"
-                              >${formatNumber(floorTotal, this.hass.locale, {
-                                maximumFractionDigits: 1,
-                              })}
-                              W</span
-                            >
-                          </ha-md-list-item>
-                        `);
+                        </div>
+                      `
+                    : nothing
+                }
+                <ha-md-list>
+                  ${
+                    this._currentView === "areas"
+                      ? (() => {
+                          const items: any[] = [];
+                          breakdown.floorGroups.forEach(
+                            (floorGroup, groupIdx) => {
+                              // Add floor divider (not before the first group)
+                              if (groupIdx > 0) {
+                                items.push(
+                                  html`<ha-md-divider
+                                    class="floor-divider"
+                                    role="separator"
+                                    tabindex="-1"
+                                  ></ha-md-divider>`
+                                );
+                              }
 
-                        // Add areas in this floor group
-                        floorGroup.areas.forEach((area) => {
-                          items.push(html`
-                            <ha-md-list-item
-                              type="button"
-                              @click=${this._createAreaClickHandler(area)}
-                            >
-                              <span slot="headline">${area.name}</span>
-                              <span class="meta" slot="end"
-                                >${formatNumber(area.value, this.hass.locale, {
-                                  maximumFractionDigits: 1,
-                                })}
-                                W</span
+                              // Add floor header item
+                              const floorTotal = floorGroup.areas.reduce(
+                                (sum, area) => sum + area.value,
+                                0
+                              );
+                              items.push(html`
+                                <ha-md-list-item
+                                  class="floor-header"
+                                  noninteractive
+                                >
+                                  <span slot="headline"
+                                    >${floorGroup.floor_name}</span
+                                  >
+                                  <span class="meta floor-total" slot="end"
+                                    >${formatNumber(
+                                      floorTotal,
+                                      this.hass.locale,
+                                      {
+                                        maximumFractionDigits: 1,
+                                      }
+                                    )}
+                                    W</span
+                                  >
+                                </ha-md-list-item>
+                              `);
+
+                              // Add areas in this floor group
+                              floorGroup.areas.forEach((area) => {
+                                items.push(html`
+                                  <ha-md-list-item
+                                    type="button"
+                                    @click=${this._createAreaClickHandler(area)}
+                                  >
+                                    <span slot="headline">${area.name}</span>
+                                    <span class="meta" slot="end"
+                                      >${formatNumber(
+                                        area.value,
+                                        this.hass.locale,
+                                        {
+                                          maximumFractionDigits: 1,
+                                        }
+                                      )}
+                                      W</span
+                                    >
+                                  </ha-md-list-item>
+                                `);
+                              });
+                            }
+                          );
+
+                          // Add untracked item with divider if it exists
+                          if (breakdown.untracked) {
+                            items.push(
+                              html`<ha-md-divider
+                                role="separator"
+                                tabindex="-1"
+                              ></ha-md-divider>`
+                            );
+                            items.push(html`
+                              <ha-md-list-item
+                                class="untracked-item"
+                                noninteractive
                               >
-                            </ha-md-list-item>
-                          `);
-                        });
-                      });
+                                <span slot="headline"
+                                  >${breakdown.untracked.name}</span
+                                >
+                                <span class="meta untracked-total" slot="end"
+                                  >${formatNumber(
+                                    breakdown.untracked.value,
+                                    this.hass.locale,
+                                    {
+                                      maximumFractionDigits: 1,
+                                    }
+                                  )}
+                                  W</span
+                                >
+                              </ha-md-list-item>
+                            `);
+                          }
 
-                      // Add untracked item with divider if it exists
-                      if (breakdown.untracked) {
-                        items.push(html`<ha-md-divider
-                          role="separator"
-                          tabindex="-1"
-                        ></ha-md-divider>`);
-                        items.push(html`
-                          <ha-md-list-item
-                            class="untracked-item"
-                            noninteractive
-                          >
-                            <span slot="headline"
-                              >${breakdown.untracked.name}</span
-                            >
-                            <span class="meta untracked-total" slot="end"
-                              >${formatNumber(
-                                breakdown.untracked.value,
-                                this.hass.locale,
-                                {
-                                  maximumFractionDigits: 1,
-                                }
-                              )}
-                              W</span
-                            >
-                          </ha-md-list-item>
-                        `);
-                      }
-
-                      return items;
-                    })()
-                  : currentNavigation?.id
-                    ? _computeEntityBreakdown(
-                        this.hass,
-                        currentNavigation.id,
-                        entityId,
-                        this._config
-                      ).map(
-                        (entity) => html`
-                          <ha-md-list-item
-                            type="button"
-                            @click=${this._createEntityClickHandler(entity)}
-                          >
-                            <span slot="headline">${entity.name}</span>
-                            <span class="meta" slot="end"
-                              >${formatNumber(entity.value, this.hass.locale, {
-                                maximumFractionDigits: 1,
-                              })}
-                              ${uom ?? ""}</span
-                            >
-                          </ha-md-list-item>
-                        `
-                      )
-                    : nothing}
-              </ha-md-list>
-            </div>
-          `
-        : nothing}
+                          return items;
+                        })()
+                      : currentNavigation?.id
+                        ? _computeEntityBreakdown(
+                            this.hass,
+                            currentNavigation.id,
+                            entityId,
+                            this._config
+                          ).map(
+                            (entity) => html`
+                              <ha-md-list-item
+                                type="button"
+                                @click=${this._createEntityClickHandler(entity)}
+                              >
+                                <span slot="headline">${entity.name}</span>
+                                <span class="meta" slot="end"
+                                  >${formatNumber(
+                                    entity.value,
+                                    this.hass.locale,
+                                    {
+                                      maximumFractionDigits: 1,
+                                    }
+                                  )}
+                                  ${uom ?? ""}</span
+                                >
+                              </ha-md-list-item>
+                            `
+                          )
+                        : nothing
+                  }
+                </ha-md-list>
+              </div>
+            `
+          : nothing
+      }
     </ha-card>`;
   }
 
