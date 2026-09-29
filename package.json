@@ -6,7 +6,8 @@
   "scripts": {
     "start": "rolldown -c --watch",
     "build": "rolldown -c",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "lint": "oxlint"
   },
   "author": {
     "name": "Aidan Timson",
@@ -19,20 +20,23 @@
   },
   "license": "ISC",
   "dependencies": {
-    "superstruct": "^2.0.2",
-    "lit": "^3.3.1",
     "culori": "^4.0.2",
+    "home-assistant-js-websocket": "^9.6.0",
+    "lit": "^3.3.1",
     "memoize-one": "^6.0.0",
-    "home-assistant-js-websocket": "^9.6.0"
+    "superstruct": "^2.0.2"
   },
   "devDependencies": {
-    "typescript": "^7.0.0",
-    "rollup-plugin-serve": "^3.0.0",
+    "@oxlint/plugins": "1.86.0",
+    "@timmo001/oxlint-rules": "0.4.0",
     "@types/color": "^4.2.0",
     "@types/hammerjs": "^2.0.46",
-    "eslint": "^10.0.0",
+    "oxlint": "1.86.0",
+    "oxlint-tsgolint": "7.0.2003",
     "prettier": "^3.6.2",
-    "rolldown": "^1.0.0-rc.11"
+    "rolldown": "^1.0.0-rc.11",
+    "rollup-plugin-serve": "^3.0.0",
+    "typescript": "^7.0.0"
   },
   "packageManager": "pnpm@12.6.0+sha512.3ef68f951cb111ac204b4a5a16f0b2ddf0da56a96e0413e81d855d9f0b55ef926714709028e1cd00c405c2c5fb7b9e8ec4dc46777c805d0373c2f2ff00fd20ec"
 }
