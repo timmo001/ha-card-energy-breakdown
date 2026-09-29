@@ -9,8 +9,10 @@ import {
   energyBreakdownCardConfigStruct,
 } from "./energy-breakdown-card-config";
 
+type ValueChangedEvent = CustomEvent<{ value: EnergyBreakdownCardConfig }>;
+
 @customElement(CARD_EDITOR_NAME)
-class EnergyBreakdownCardEditor extends LitElement {
+export class EnergyBreakdownCardEditor extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
 
   @state() private _config?: EnergyBreakdownCardConfig;
@@ -178,13 +180,13 @@ class EnergyBreakdownCardEditor extends LitElement {
         .schema=${this._schema}
         .computeLabel=${this._computeLabelCallback}
         .computeHelper=${this._computeHelperCallback}
-        @value-changed=${this._valueChanged}
+        @value-changed=${(ev: ValueChangedEvent) => this._valueChanged(ev)}
       ></ha-form>
     `;
   }
 
-  private _valueChanged(ev: CustomEvent): void {
-    const newConfig = ev.detail.value as EnergyBreakdownCardConfig;
+  private _valueChanged(ev: ValueChangedEvent): void {
+    const newConfig = ev.detail.value;
 
     const config: EnergyBreakdownCardConfig = {
       ...newConfig,

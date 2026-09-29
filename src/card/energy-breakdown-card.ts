@@ -7,6 +7,7 @@ import {
   computeAreaName,
   fireEvent,
   formatNumber,
+  formatNumberString,
   generateEntityFilter,
   haStyleScrollbar,
   HomeAssistant,
@@ -18,12 +19,7 @@ import {
 import { BaseElement } from "../utils/base-element";
 import { cardStyle } from "../utils/card-styles";
 import { registerCustomCard } from "../utils/custom-cards";
-import {
-  CARD_DESCRIPTION,
-  CARD_NAME_FRIENDLY,
-  CARD_EDITOR_NAME,
-  CARD_NAME,
-} from "./const";
+import { CARD_DESCRIPTION, CARD_NAME_FRIENDLY, CARD_NAME } from "./const";
 import {
   EnergyBreakdownCardConfig,
   energyBreakdownCardConfigStruct,
@@ -82,8 +78,10 @@ registerCustomCard({
 @customElement(CARD_NAME)
 export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
-    await import("./energy-breakdown-card-editor");
-    return document.createElement(CARD_EDITOR_NAME) as LovelaceCardEditor;
+    const { EnergyBreakdownCardEditor } =
+      await import("./energy-breakdown-card-editor");
+
+    return new EnergyBreakdownCardEditor();
   }
 
   public setConfig(config: EnergyBreakdownCardConfig): void {
@@ -117,8 +115,9 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   protected willUpdate(changedProps: PropertyValues): void {
     super.willUpdate(changedProps);
+
     if (changedProps.has("_config") && this._config?.header_day_show) {
-      this._fetchDayTotal();
+      void this._fetchDayTotal();
       this._startPeriodicFetch();
     }
   }
@@ -132,6 +131,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         device_class: "power",
       })
     );
+
     if (powerSensors.length === 0) {
       return { type: `custom:${CARD_NAME}` };
     }
@@ -139,6 +139,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     const validStates = powerSensors
       .map((id) => hass.states[id])
       .filter((st) => st && isNumericState(st) && !isNaN(Number(st.state)));
+
     if (validStates.length === 0) {
       return { type: `custom:${CARD_NAME}` };
     }
@@ -160,6 +161,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
   private async _fetchDayTotal(): Promise<void> {
     if (!this._config?.header_day_show || !this.hass) {
       this._dayTotal = null;
+
       return;
     }
 
@@ -167,6 +169,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       // Get all energy sensors (device_class: energy, state_class: total_increasing)
       const energySensors = Object.keys(this.hass.states).filter((entityId) => {
         const state = this.hass.states[entityId];
+
         return (
           state &&
           state.attributes.device_class === "energy" &&
@@ -176,6 +179,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
       if (energySensors.length === 0) {
         this._dayTotal = null;
+
         return;
       }
 
@@ -202,6 +206,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
       // Calculate total energy consumption for the day
       let totalEnergy = 0;
+
       for (const entityStats of Object.values(stats)) {
         for (const stat of entityStats) {
           if (stat.change !== null && stat.change !== undefined) {
@@ -224,7 +229,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     }
 
     this._fetchInterval = window.setInterval(() => {
-      this._fetchDayTotal();
+      void this._fetchDayTotal();
     }, FETCH_INTERVAL);
   }
 
@@ -253,6 +258,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     const powerEntityCompatible = currentStateObj
       ? currentStateObj.attributes.device_class === "power"
       : true;
+
     if (!powerEntityCompatible) {
       return html`<ha-alert alert-type="error">
         Invalid power entity
@@ -260,6 +266,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     }
 
     const uom = currentStateObj?.attributes.unit_of_measurement;
+
     const powerEntityIcon = this._config.header_current_icon?.length
       ? this._config.header_current_icon
       : "mdi:lightning-bolt";
@@ -278,6 +285,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         let breakdowns = Object.values(hass.areas)
           .map((area: any): Breakdown | null => {
             const areaName = computeAreaName(area);
+
             if (!areaName) {
               return null;
             }
@@ -321,10 +329,12 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
         // Calculate untracked value before filtering
         let untrackedItem: Breakdown | null = null;
+
         if (powerEntityState && config?.breakdown_show_untracked !== false) {
           const untrackedValue =
             Number(powerEntityState) -
             breakdowns.reduce((acc, bd) => acc + bd.value, 0);
+
           if (untrackedValue > 0 || config?.breakdown_show_zero_values) {
             untrackedItem = {
               id: "untracked",
@@ -344,13 +354,15 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         const noFloorAreas: Breakdown[] = [];
 
         for (const breakdown of breakdowns) {
-          const floorId = (breakdown as any).floor_id || null;
+          const floorId = breakdown.floor_id || null;
+
           if (floorId === null) {
             noFloorAreas.push(breakdown);
           } else {
             if (!floorGroupsMap.has(floorId)) {
               floorGroupsMap.set(floorId, []);
             }
+
             floorGroupsMap.get(floorId)!.push(breakdown);
           }
         }
@@ -361,11 +373,13 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
         const sortBreakdowns = (a: Breakdown, b: Breakdown) => {
           let comparison = 0;
+
           if (sortBy === "value") {
             comparison = a.value - b.value;
           } else {
             comparison = a.name.localeCompare(b.name);
           }
+
           return sortOrder === "desc" ? -comparison : comparison;
         };
 
@@ -385,6 +399,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         floorGroupsMap.forEach((areas, floorId) => {
           const floor =
             floorId && hass.floors ? hass.floors[floorId] : undefined;
+
           if (floor) {
             const floorGroup: FloorGroup = {
               floor_id: floorId,
@@ -392,6 +407,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
               floor_level: floor.level ?? null,
               areas: areas,
             };
+
             if (floor.level !== null && floor.level !== undefined) {
               floorsWithLevel.push(floorGroup);
             } else {
@@ -404,6 +420,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         floorsWithLevel.sort((a, b) => {
           const levelA = a.floor_level ?? Infinity;
           const levelB = b.floor_level ?? Infinity;
+
           return levelA - levelB;
         });
 
@@ -433,6 +450,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       currentStateObj?.state,
       this._config
     );
+
     const gridRows = Number(
       this._config.grid_options?.rows ?? this.getGridOptions().rows
     );
@@ -479,6 +497,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
     const currentNavigation =
       this._navigationStack[this._navigationStack.length - 1];
+
     const showBackButton =
       this._currentView === "entities" && currentNavigation;
 
@@ -503,7 +522,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                     ? html`
                         <div
                           class="power-section"
-                          @click=${this._handleCurrentClick}
+                          @click=${() => this._handleCurrentClick()}
                         >
                           <div class="section-value">
                             <ha-icon
@@ -515,7 +534,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                                 currentStateObj
                                   ? isUnavailableState(currentStateObj.state)
                                     ? "N/A"
-                                    : formatNumber(
+                                    : formatNumberString(
                                         currentStateObj.state,
                                         this.hass.locale,
                                         {
@@ -549,7 +568,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                     ? html`
                         <div
                           class="day-total-section"
-                          @click=${this._handleDayTotalClick}
+                          @click=${() => this._handleDayTotalClick()}
                         >
                           <div class="section-value">
                             <ha-icon class="icon" .icon=${todayIcon}></ha-icon>
@@ -590,7 +609,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                     ? html`
                         <div class="navigation-header">
                           <ha-icon-button-arrow-prev
-                            @click=${this._goBack}
+                            @click=${() => this._goBack()}
                             .hass=${this.hass}
                           ></ha-icon-button-arrow-prev>
                           <span class="navigation-title"
@@ -623,6 +642,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                                 (sum, area) => sum + area.value,
                                 0
                               );
+
                               items.push(html`
                                 <ha-md-list-item
                                   class="floor-header"

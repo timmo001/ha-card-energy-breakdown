@@ -39,6 +39,7 @@ declare global {
       getComputedStyleValue(element, propertyName);
     };
   }
+
   // for fire event
   interface HASSDomEvents {
     "value-changed": {
@@ -108,7 +109,7 @@ interface ThemeSettings {
   accentColor?: string;
 }
 
-interface PanelInfo<T = Record<string, any> | null> {
+interface PanelInfo<T = object | null> {
   component_name: string;
   config: T;
   icon: string | null;
@@ -160,7 +161,7 @@ interface CurrentUser {
 interface ServiceCallRequest {
   domain: string;
   service: string;
-  serviceData?: Record<string, any>;
+  serviceData?: object;
   target?: HassServiceTarget;
 }
 
@@ -219,10 +220,10 @@ export interface HomeAssistant {
   callApi<T>(
     method: "GET" | "POST" | "PUT" | "DELETE",
     path: string,
-    parameters?: Record<string, any>,
+    parameters?: ServiceCallRequest["serviceData"],
     headers?: Record<string, string>
   ): Promise<T>;
-  fetchWithAuth(path: string, init?: Record<string, any>): Promise<Response>;
+  fetchWithAuth(path: string, init?: RequestInit): Promise<Response>;
   sendWS(msg: MessageBase): void;
   callWS<T>(msg: MessageBase): Promise<T>;
   loadBackendTranslation(
@@ -239,11 +240,9 @@ export interface HomeAssistant {
   formatEntityAttributeName(stateObj: HassEntity, attribute: string): string;
 }
 
-
 // Lovelace interfaces needed by the card
 export interface LovelaceCardConfig {
   type: string;
-  [key: string]: unknown;
 }
 
 export interface LovelaceCard {
@@ -255,16 +254,7 @@ export interface LovelaceCardEditor extends HTMLElement {
   hass?: HomeAssistant;
 }
 
-
-
 // Additional Lovelace types
 export interface ActionConfig {
   action?: string;
-  [key: string]: any;
 }
-
-
-
-
-
-

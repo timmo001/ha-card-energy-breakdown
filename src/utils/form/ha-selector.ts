@@ -284,27 +284,8 @@ interface LocationSelector {
   } | null;
 }
 
-interface LocationSelectorValue {
-  latitude: number;
-  longitude: number;
-  radius?: number;
-}
-
 interface MediaSelector {
   media: {} | null;
-}
-
-interface MediaSelectorValue {
-  entity_id?: string;
-  media_content_id?: string;
-  media_content_type?: string;
-  metadata?: {
-    title?: string;
-    thumbnail?: string | null;
-    media_class?: string;
-    children_media_class?: string | null;
-    navigateIds?: { media_content_type: string; media_content_id: string }[];
-  };
 }
 
 interface NavigationSelector {
@@ -426,6 +407,7 @@ interface TemplateSelector {
 interface ThemeSelector {
   theme: { include_default?: boolean } | null;
 }
+
 interface TimeSelector {
   time: { no_second?: boolean } | null;
 }

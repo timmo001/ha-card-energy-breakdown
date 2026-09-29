@@ -31,7 +31,7 @@ export default defineConfig({
   transform: {
     target: "es2017",
   },
-  plugins: [...(dev ? [serve(serveOptions)] : [])],
+  plugins: dev ? [serve(serveOptions)] : [],
   moduleContext: (id) => {
     if (thisAsWindowForModules.some((id_) => id.trimEnd().endsWith(id_))) {
       return "window";

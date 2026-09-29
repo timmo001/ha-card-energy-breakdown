@@ -35,10 +35,6 @@ declare global {
 
 type ValidHassDomEvent = keyof HASSDomEvents;
 
-interface HASSDomEvent<T> extends Event {
-  detail: T;
-}
-
 /**
  * Dispatches a custom event with an optional detail value.
  *
@@ -67,12 +63,15 @@ export const fireEvent = <HassEvent extends ValidHassDomEvent>(
   options = options || {};
   // @ts-ignore
   detail = detail === null || detail === undefined ? {} : detail;
-  const event = new Event(type, {
+
+  const event = new CustomEvent(type, {
+    detail,
     bubbles: options.bubbles === undefined ? true : options.bubbles,
     cancelable: Boolean(options.cancelable),
     composed: options.composed === undefined ? true : options.composed,
   });
-  (event as any).detail = detail;
+
   node.dispatchEvent(event);
+
   return event;
 };

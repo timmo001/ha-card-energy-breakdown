@@ -1,4 +1,3 @@
-import type { LitElement } from "lit";
 import { Selector } from "./ha-selector";
 
 interface HaDurationData {
@@ -38,12 +37,7 @@ interface HaFormBaseSchema {
 }
 
 type HaFormConditionOperator =
-  | "eq"
-  | "not_eq"
-  | "in"
-  | "not_in"
-  | "exists"
-  | "not_exists";
+  "eq" | "not_eq" | "in" | "not_in" | "exists" | "not_exists";
 
 interface HaFormFieldCondition {
   field: string;
@@ -145,38 +139,19 @@ interface HaFormTimeSchema extends HaFormBaseSchema {
   type: "positive_time_period_dict";
 }
 
-// Type utility to unionize a schema array by flattening any grid schemas
-type SchemaUnion<
-  SchemaArray extends readonly HaFormSchema[],
-  Schema = SchemaArray[number],
-> = Schema extends
-  | HaFormGridSchema
-  | HaFormExpandableSchema
-  | HaFormOptionalActionsSchema
-  ? SchemaUnion<Schema["schema"]> | Schema
-  : Schema;
-
-type HaFormDataContainer = Record<string, HaFormData>;
-
 type HaFormData =
   | HaFormStringData
   | HaFormIntegerData
-  | HaFormFloatData
   | HaFormBooleanData
-  | HaFormSelectData
   | HaFormMultiSelectData
   | HaFormTimeData;
 
 type HaFormStringData = string;
-type HaFormIntegerData = number;
-type HaFormFloatData = number;
-type HaFormBooleanData = boolean;
-type HaFormSelectData = string;
-type HaFormMultiSelectData = string[];
-type HaFormTimeData = HaDurationData;
 
-interface HaFormElement extends LitElement {
-  schema: HaFormSchema | readonly HaFormSchema[];
-  data?: HaFormDataContainer | HaFormData;
-  label?: string;
-}
+type HaFormIntegerData = number;
+
+type HaFormBooleanData = boolean;
+
+type HaFormMultiSelectData = string[];
+
+type HaFormTimeData = HaDurationData;
