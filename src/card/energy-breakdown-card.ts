@@ -325,7 +325,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
             return null;
           })
-          .filter((bd): bd is Breakdown => bd !== null);
+          .filter((bd) => bd !== null);
 
         // Calculate untracked value before filtering
         let untrackedItem: Breakdown | null = null;
@@ -359,11 +359,13 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           if (floorId === null) {
             noFloorAreas.push(breakdown);
           } else {
-            if (!floorGroupsMap.has(floorId)) {
-              floorGroupsMap.set(floorId, []);
-            }
+            const floorGroup = floorGroupsMap.get(floorId);
 
-            floorGroupsMap.get(floorId)!.push(breakdown);
+            if (floorGroup) {
+              floorGroup.push(breakdown);
+            } else {
+              floorGroupsMap.set(floorId, [breakdown]);
+            }
           }
         }
 
