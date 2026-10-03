@@ -1,6 +1,7 @@
 import { css, CSSResultGroup, html, nothing, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
+import { styleMap } from "lit/directives/style-map.js";
 import memoizeOne from "memoize-one";
 import { assert } from "superstruct";
 import {
@@ -82,6 +83,12 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       await import("./energy-breakdown-card-editor");
 
     return new EnergyBreakdownCardEditor();
+  }
+
+  private get _cardOpacity(): number {
+    return (
+      this._config?.card_opacity ?? (this._config?.hide_background ? 0 : 100)
+    );
   }
 
   public setConfig(config: EnergyBreakdownCardConfig): void {
@@ -504,8 +511,10 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       this._currentView === "entities" && currentNavigation;
 
     return html`<ha-card
+      style=${styleMap({ "--card-opacity": `${this._cardOpacity}%` })}
       class=${classMap({
-        "hide-background": this._config?.hide_background === true,
+        "hide-background": this._cardOpacity === 0,
+        translucent: this._cardOpacity < 100,
       })}
     >
       ${
@@ -814,10 +823,20 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           gap: 8px;
         }
 
-        ha-card.hide-background {
-          background: transparent;
+        ha-card.translucent {
+          background: color-mix(
+            in srgb,
+            var(--ha-card-background, var(--card-background-color, white))
+              var(--card-opacity),
+            transparent
+          );
+          border-color: color-mix(
+            in srgb,
+            var(--ha-card-border-color, var(--divider-color, #e0e0e0))
+              var(--card-opacity),
+            transparent
+          );
           box-shadow: none;
-          border: none;
         }
 
         .heading {

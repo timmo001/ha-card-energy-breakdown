@@ -2,6 +2,7 @@ import {
   assign,
   boolean,
   defaulted,
+  number,
   object,
   optional,
   string,
@@ -11,6 +12,8 @@ import { lovelaceCardConfigStruct } from "../shared/config/lovelace-card-config"
 
 export interface EnergyBreakdownCardConfig extends LovelaceCardConfig {
   power_entity?: string;
+  card_opacity?: number;
+  /** @deprecated Use card_opacity */
   hide_background?: boolean;
   header_current_show?: boolean;
   header_day_show?: boolean;
@@ -28,6 +31,7 @@ export const energyBreakdownCardConfigStruct = assign(
   lovelaceCardConfigStruct,
   object({
     power_entity: optional(string()),
+    card_opacity: optional(number()),
     hide_background: optional(boolean()),
     header_current_show: optional(defaulted(boolean(), true)),
     header_day_show: optional(defaulted(boolean(), true)),
