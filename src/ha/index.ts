@@ -16,6 +16,10 @@ export { configElementStyle } from "./panels/lovelace/editor/config-elements/con
 
 export { isNumericState, isUnavailableState } from "./data/entity";
 
+export { getEnergyPreferences } from "./data/energy";
+
+export type { DeviceConsumptionEnergyPreference } from "./data/energy";
+
 export type {
   HomeAssistant,
   LovelaceCard,

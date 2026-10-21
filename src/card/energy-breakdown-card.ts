@@ -6,10 +6,12 @@ import memoizeOne from "memoize-one";
 import { assert } from "superstruct";
 import {
   computeAreaName,
+  DeviceConsumptionEnergyPreference,
   fireEvent,
   formatNumber,
   formatNumberString,
   generateEntityFilter,
+  getEnergyPreferences,
   haStyleScrollbar,
   HomeAssistant,
   isNumericState,
@@ -52,6 +54,52 @@ declare global {
     "hass-more-info": { entityId: string };
   }
 }
+
+/**
+ * Ids whose `included_in_stat` chain reaches another counted id. Their value
+ * is already part of that ancestor, so totals must skip them.
+ */
+const findNestedIds = (
+  devices: DeviceConsumptionEnergyPreference[],
+  getId: (device: DeviceConsumptionEnergyPreference) => string | undefined,
+  counted: Set<string>
+): Set<string> => {
+  const deviceByStat = new Map(
+    devices.map((device) => [device.stat_consumption, device])
+  );
+
+  const nested = new Set<string>();
+
+  for (const device of devices) {
+    const id = getId(device);
+
+    if (!id || !counted.has(id)) {
+      continue;
+    }
+
+    // Bounded because a hand-edited config can make included_in_stat cyclic.
+    let ancestor = device.included_in_stat;
+
+    for (let hops = 0; ancestor && hops < devices.length; hops++) {
+      const parent = deviceByStat.get(ancestor);
+
+      if (!parent) {
+        break;
+      }
+
+      const parentId = getId(parent);
+
+      if (parentId && counted.has(parentId)) {
+        nested.add(id);
+        break;
+      }
+
+      ancestor = parent.included_in_stat;
+    }
+  }
+
+  return nested;
+};
 
 registerCustomCard({
   type: CARD_NAME,
@@ -118,10 +166,18 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
   @state() private _dayTotal: number | null = null;
 
+  @state() private _energyDevices: DeviceConsumptionEnergyPreference[] = [];
+
+  private _energyDevicesPromise?: Promise<DeviceConsumptionEnergyPreference[]>;
+
   private _fetchInterval?: number;
 
   protected willUpdate(changedProps: PropertyValues): void {
     super.willUpdate(changedProps);
+
+    if (this.hass && !this._energyDevicesPromise) {
+      void this._loadEnergyDevices();
+    }
 
     if (changedProps.has("_config") && this._config?.header_day_show) {
       void this._fetchDayTotal();
@@ -165,6 +221,26 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
     return 6;
   }
 
+  private _loadEnergyDevices(): Promise<DeviceConsumptionEnergyPreference[]> {
+    this._energyDevicesPromise ??= getEnergyPreferences(this.hass).then(
+      (prefs) => {
+        this._energyDevices = prefs.device_consumption;
+
+        return prefs.device_consumption;
+      },
+      (error) => {
+        // not_found means energy is not set up, so there are no relationships
+        if (error?.code !== "not_found") {
+          console.error("Error fetching energy preferences:", error);
+        }
+
+        return [];
+      }
+    );
+
+    return this._energyDevicesPromise;
+  }
+
   private async _fetchDayTotal(): Promise<void> {
     if (!this._config?.header_day_show || !this.hass) {
       this._dayTotal = null;
@@ -190,6 +266,16 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         return;
       }
 
+      const nestedSensors = findNestedIds(
+        await this._loadEnergyDevices(),
+        (device) => device.stat_consumption,
+        new Set(energySensors)
+      );
+
+      const countedSensors = energySensors.filter(
+        (entityId) => !nestedSensors.has(entityId)
+      );
+
       // Get start of current day
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
@@ -205,7 +291,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         type: "recorder/statistics_during_period",
         start_time: startOfDay.toISOString(),
         end_time: new Date().toISOString(),
-        statistic_ids: energySensors,
+        statistic_ids: countedSensors,
         period: "hour",
         units: { energy: "kWh" },
         types: ["change"],
@@ -287,10 +373,11 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
         hass: any,
         powerEntityId?: string,
         powerEntityState?: string,
-        config?: any
+        config?: any,
+        energyDevices: DeviceConsumptionEnergyPreference[] = []
       ): GroupedBreakdown => {
-        let breakdowns = Object.values(hass.areas)
-          .map((area: any): Breakdown | null => {
+        const areaPowerEntities = Object.values(hass.areas)
+          .map((area: any) => {
             const areaName = computeAreaName(area);
 
             if (!areaName) {
@@ -315,10 +402,29 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                   !isNaN(Number(st.state))
               );
 
-            const sum = validPowerEntities.reduce(
-              (acc, entity) => acc + Number(entity.state),
-              0
-            );
+            return { area, areaName, validPowerEntities };
+          })
+          .filter((entry) => entry !== null);
+
+        const nestedPowerEntities = findNestedIds(
+          energyDevices,
+          (device) => device.stat_rate,
+          new Set(
+            areaPowerEntities.reduce<string[]>(
+              (ids, { validPowerEntities }) => [
+                ...ids,
+                ...validPowerEntities.map((st) => st.entity_id),
+              ],
+              []
+            )
+          )
+        );
+
+        let breakdowns = areaPowerEntities
+          .map(({ area, areaName, validPowerEntities }): Breakdown | null => {
+            const sum = validPowerEntities
+              .filter((entity) => !nestedPowerEntities.has(entity.entity_id))
+              .reduce((acc, entity) => acc + Number(entity.state), 0);
 
             // Only show areas that have power sensors
             if (validPowerEntities.length > 0) {
@@ -457,7 +563,8 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
       this.hass,
       entityId,
       currentStateObj?.state,
-      this._config
+      this._config,
+      this._energyDevices
     );
 
     const gridRows = Number(
