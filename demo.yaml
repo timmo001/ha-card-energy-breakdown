@@ -1,0 +1,18 @@
+# Live demo on https://timmo.dev/demos/ha-card-energy-breakdown, rendered with
+# Home Assistant's embed components against mocked entities. It's read from
+# each release, so it has to match that release's card.
+#
+# The demo's mocked backend has no areas, energy preferences or statistics, so
+# this shows the current usage only.
+entities:
+  - entity_id: sensor.home_power
+    state: "1840"
+    attributes:
+      friendly_name: Home power
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: W
+cards:
+  - type: custom:energy-breakdown-card
+    power_entity: sensor.home_power
+    header_day_show: false
