@@ -1,0 +1,48 @@
+# Live demo on https://timmo.dev/demos/ha-card-energy-breakdown, rendered with
+# Home Assistant's embed components against mocked entities. It's read from
+# each release, so it has to match that release's card.
+#
+# Each `area_id` becomes an area, so the breakdown groups the power sensors by
+# area.
+entities:
+  - entity_id: sensor.home_power
+    state: "1840"
+    attributes:
+      friendly_name: Home power
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: W
+  - entity_id: sensor.kitchen_power
+    state: "720"
+    area_id: kitchen
+    attributes:
+      friendly_name: Kitchen power
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: W
+  - entity_id: sensor.living_room_power
+    state: "410"
+    area_id: living_room
+    attributes:
+      friendly_name: Living room power
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: W
+  - entity_id: sensor.office_power
+    state: "290"
+    area_id: office
+    attributes:
+      friendly_name: Office power
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: W
+  - entity_id: sensor.home_energy
+    state: "12.4"
+    attributes:
+      friendly_name: Home energy today
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+cards:
+  - type: custom:energy-breakdown-card
+    power_entity: sensor.home_power
