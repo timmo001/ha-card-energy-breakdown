@@ -737,7 +737,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                       `
                     : nothing
                 }
-                <ha-md-list>
+                <div class="list">
                   ${
                     this._currentView === "areas"
                       ? (() => {
@@ -747,11 +747,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                               // Add floor divider (not before the first group)
                               if (groupIdx > 0) {
                                 items.push(
-                                  html`<ha-md-divider
-                                    class="floor-divider"
-                                    role="separator"
-                                    tabindex="-1"
-                                  ></ha-md-divider>`
+                                  html`<hr class="divider floor-divider" />`
                                 );
                               }
 
@@ -762,14 +758,11 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                               );
 
                               items.push(html`
-                                <ha-md-list-item
-                                  class="floor-header"
-                                  noninteractive
-                                >
-                                  <span slot="headline"
+                                <div class="item floor-header">
+                                  <span class="headline"
                                     >${floorGroup.floor_name}</span
                                   >
-                                  <span class="meta floor-total" slot="end"
+                                  <span class="meta floor-total"
                                     >${formatNumber(
                                       floorTotal,
                                       this.hass.locale,
@@ -779,18 +772,19 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                                     )}
                                     W</span
                                   >
-                                </ha-md-list-item>
+                                </div>
                               `);
 
                               // Add areas in this floor group
                               floorGroup.areas.forEach((area) => {
                                 items.push(html`
-                                  <ha-md-list-item
+                                  <button
                                     type="button"
+                                    class="item"
                                     @click=${this._createAreaClickHandler(area)}
                                   >
-                                    <span slot="headline">${area.name}</span>
-                                    <span class="meta" slot="end"
+                                    <span class="headline">${area.name}</span>
+                                    <span class="meta"
                                       >${formatNumber(
                                         area.value,
                                         this.hass.locale,
@@ -800,7 +794,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                                       )}
                                       W</span
                                     >
-                                  </ha-md-list-item>
+                                  </button>
                                 `);
                               });
                             }
@@ -808,21 +802,13 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
 
                           // Add untracked item with divider if it exists
                           if (breakdown.untracked) {
-                            items.push(
-                              html`<ha-md-divider
-                                role="separator"
-                                tabindex="-1"
-                              ></ha-md-divider>`
-                            );
+                            items.push(html`<hr class="divider" />`);
                             items.push(html`
-                              <ha-md-list-item
-                                class="untracked-item"
-                                noninteractive
-                              >
-                                <span slot="headline"
+                              <div class="item untracked-item">
+                                <span class="headline"
                                   >${breakdown.untracked.name}</span
                                 >
-                                <span class="meta untracked-total" slot="end"
+                                <span class="meta untracked-total"
                                   >${formatNumber(
                                     breakdown.untracked.value,
                                     this.hass.locale,
@@ -832,7 +818,7 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                                   )}
                                   W</span
                                 >
-                              </ha-md-list-item>
+                              </div>
                             `);
                           }
 
@@ -846,12 +832,13 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                             this._config
                           ).map(
                             (entity) => html`
-                              <ha-md-list-item
+                              <button
                                 type="button"
+                                class="item"
                                 @click=${this._createEntityClickHandler(entity)}
                               >
-                                <span slot="headline">${entity.name}</span>
-                                <span class="meta" slot="end"
+                                <span class="headline">${entity.name}</span>
+                                <span class="meta"
                                   >${formatNumber(
                                     entity.value,
                                     this.hass.locale,
@@ -861,12 +848,12 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
                                   )}
                                   ${uom ?? ""}</span
                                 >
-                              </ha-md-list-item>
+                              </button>
                             `
                           )
                         : nothing
                   }
-                </ha-md-list>
+                </div>
               </div>
             `
           : nothing
@@ -1046,44 +1033,76 @@ export class EnergyBreakdownCard extends BaseElement implements LovelaceCard {
           width: 100%;
         }
 
-        .breakdown ha-md-list {
-          --md-list-item-label-text-line-height: var(
-            --ha-line-height-condensed
+        .list {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .item {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          box-sizing: border-box;
+          width: 100%;
+          margin: 0;
+          padding: 8px 16px;
+          border: none;
+          background: none;
+          color: var(--primary-text-color);
+          font-family: var(--ha-font-family-body);
+          font-size: var(--ha-font-size-l);
+          font-weight: var(--ha-font-weight-normal);
+          line-height: var(--ha-line-height-condensed);
+          text-align: start;
+        }
+
+        button.item {
+          cursor: pointer;
+          outline: none;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        button.item:hover {
+          background-color: color-mix(
+            in srgb,
+            var(--primary-text-color) 8%,
+            transparent
           );
-          --md-list-item-one-line-container-height: 16px;
-          --md-list-item-top-space: 8px;
-          --md-list-item-bottom-space: 8px;
-          padding: 0;
         }
 
-        .breakdown ha-md-list-item.untracked-item {
-          pointer-events: none;
-          --md-list-item-label-text-color: var(--secondary-text-color);
-          --md-list-item-supporting-text-color: var(--secondary-text-color);
+        button.item:active {
+          background-color: color-mix(
+            in srgb,
+            var(--primary-text-color) 12%,
+            transparent
+          );
+        }
+
+        button.item:focus-visible {
+          outline: 2px solid var(--primary-color);
+          outline-offset: -2px;
+          border-radius: 8px;
+        }
+
+        .item .headline {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .item.floor-header,
+        .item.untracked-item {
+          color: var(--secondary-text-color);
           font-weight: var(--ha-font-weight-medium);
-        }
-
-        .breakdown ha-md-list-item.floor-header {
-          pointer-events: none;
-          --md-list-item-label-text-color: var(--secondary-text-color);
-          --md-list-item-supporting-text-color: var(--secondary-text-color);
-          font-weight: var(--ha-font-weight-medium);
-        }
-
-        .breakdown ha-md-list-item.floor-header [slot="headline"],
-        .breakdown ha-md-list-item.untracked-item [slot="headline"] {
           font-style: italic;
         }
 
-        .breakdown ha-md-list-item.floor-header .floor-total {
-          font-style: italic;
+        .divider {
+          margin: 0;
+          border: none;
+          border-top: 1px solid var(--divider-color);
         }
 
-        .breakdown ha-md-list-item.untracked-item .untracked-total {
-          font-style: italic;
-        }
-
-        .breakdown ha-md-divider.floor-divider {
+        .divider.floor-divider {
           opacity: 0.4;
         }
 
