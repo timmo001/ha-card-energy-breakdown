@@ -641,8 +641,8 @@ packages:
   memoize-one@6.0.0:
     resolution: {integrity: sha512-rkpe71W0N0c0Xz6QD0eJETuWAJGnJ9afsl1srmwPrI+yBCkge5EycXXbYRyvL29zZVUWQCY7InPRCv3GDXuZNw==}
 
-  mime@4.1.1:
-    resolution: {integrity: sha512-YAApRsTpM2+gnUFHhRNGfkX8NK0V5xj1nyQLufGlwEI+eX4xRsTcel2IXDuMEGSGjBvzykNW4VuoEACgwYe7BQ==}
+  mime@4.1.2:
+    resolution: {integrity: sha512-ikRzZ2RwbUVDyL9SsU0f2Phcmav4yq5r8faH5ZZKHtOZrMBLnrQOrj0uvqZ5R1uQnj+RO7Wcklw/lAf81mP9LQ==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -924,7 +924,7 @@ snapshots:
 
   memoize-one@6.0.0: {}
 
-  mime@4.1.1: {}
+  mime@4.1.2: {}
 
   opener@1.5.2: {}
 
@@ -985,7 +985,7 @@ snapshots:
 
   rollup-plugin-serve@3.0.0:
     dependencies:
-      mime: 4.1.1
+      mime: 4.1.2
       opener: 1.5.2
 
   superstruct@2.0.2: {}
