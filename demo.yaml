@@ -3,7 +3,8 @@
 # each release, so it has to match that release's card.
 #
 # Each `area_id` becomes an area, so the breakdown groups the power sensors by
-# area.
+# area. The card takes the rows of a section, so it sets enough to show every
+# area without scrolling.
 entities:
   - entity_id: sensor.home_power
     state: "1840"
@@ -46,3 +47,5 @@ entities:
 cards:
   - type: custom:energy-breakdown-card
     power_entity: sensor.home_power
+    grid_options:
+      rows: 5
