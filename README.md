@@ -14,6 +14,7 @@ A custom Home Assistant card for visualizing current energy usage with a breakdo
 - Clean and modern interface
 
 <!-- ha-marketplace:exclude-start -->
+
 ## Installation
 
 ### HACS (Recommended)
@@ -33,6 +34,7 @@ Since this card is not yet in the default HACS store, you need to add it as a cu
 1. Download `energy-breakdown-card.js` from the latest release
 2. Place it in your `config/www` folder
 3. Add the resource in your Lovelace dashboard
+
 <!-- ha-marketplace:exclude-end -->
 
 ## Usage
